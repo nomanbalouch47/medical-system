@@ -101,28 +101,24 @@ include_once('include/head.php');
                 <form>
                   <div class="row">
                     <div class="col-md-6">
-                      <div class="form-group">                        
-                          <input class="form-control" type="text" placeholder="Date" id="search_by_date" name="search_by_date" value="<?php echo $time; ?>">
-                          <span class="calendar-grid-58"></span>
+                      <div class="form-group">   
+                      <label class="form-control-label" for="reg_date">Date</label>                     
+                        <input class="form-control datepicker" type="text" placeholder="mm/dd/yyyy" id="reg_date" name="reg_date">
+                        <span class="calendar-grid-58"></span>
                       </div>
-
-                      <?php
-                      if(barcode_rights($loginuser,26)==1){
-                        ?>
-                        
                       <div class="form-group">                        
-                          <input class="form-control" type="password" placeholder="********" id="sticker_barcode" name="sticker_barcode" onkeyup="check_lab_sticker(event,'admin');">
-                          
+                        <label class="form-control-label" for="user_id">Serial Number</label>
+                        <input class="form-control" type="text" placeholder="***/*/*" id="serial_no" name="serial_no" onkeyup="change_lab_sticker_attempts(event,'admin');">
                       </div>
-                   
-                        <?php
-                      }
-
-                      ?>
-                     
                     </div>
-                    
-
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label class="form-control-label" for="user_id">Users</label>
+                        <select class="form-control select2-hidden-accessible" data-toggle="select" data-select2-id="1" tabindex="-1" aria-hidden="true" name="select_user" id="user_id" required="">
+                            <?php get_all_users($loginuser); ?>
+                          </select>
+                      </div>
+                    </div>
                   </div>
                   <div class="row">
                     <div class="col-md-6">

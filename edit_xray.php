@@ -98,7 +98,6 @@ include_once('include/head.php');
         </div> -->
          <?php fill_xray_result(); ?> 
 
-         <?php upload_xray_result(); ?> 
 
         
           <div class="col-lg-12">
@@ -116,7 +115,7 @@ include_once('include/head.php');
              <!-- <input type="hidden" name="reg_id" value="<?php echo $reg_id; ?>"> -->
               <!-- Card body -->
               <div class="card-body">
-                <form method="post" action="">
+                <form method="post" action="" enctype="multipart/form-data">
                   <div class="row">
                     <div class="col-md-6">
                       <div class="form-group">                        
@@ -129,31 +128,31 @@ include_once('include/head.php');
                     <div class="col-md-6">
                       <div class="form-group">                        
                           <label class="form-control-label" for="item_2">X-Ray Chest</label>
-                          <select class="form-control" name="xray_chest" id="item_2">
+                          <select class="form-control" name="xray_chest" id="item_2" value="<?php echo $xray_chest; ?>">
                             <?php
-                              // $options = array('lung fields clear' => 'LUNG FIELDS CLEAR', 'unfit due to x-ray findings' => 'Unfit Due to X-Ray Findings.', 'see notes' => 'See Notes' );
-                              // foreach ($options as $key => $value) {
-                              //     echo $key;
-                              //     echo $xray_chest;
-                              //     if($value == $xray_chest)
-                              //       echo "<option selected='selected' value='".$key."'>".$value."</option>";
-                              //     else
-                              //       echo "<option value='".$key."'>".$value."</option>";
-                              // }
+                              $options = array('lung fields clear' => 'LUNG FIELDS CLEAR', 'unfit due to x-ray findings' => 'Unfit Due to X-Ray Findings.', 'repeat' => 'Repeat', 'see notes' => 'See Notes' );
 
-                              if($xray_chest=='lung fields clear') {
-                                echo "<option value='$xray_chest' selected>LUNG FIELDS CLEAR</option>";
-                                echo "<option value='unfit due to x-ray findings'>Unfit Due to X-Ray Findings.</option>";
-                                echo "<option value='see notes'>See Notes</option>";
-                              } elseif($xray_chest=='unfit due to x-ray findings') {
-                                echo "<option value='$xray_chest' selected=selected>Unfit Due to X-Ray Findings.</option>";
-                                echo "<option value='lung fields clear'>LUNG FIELDS CLEAR</option>";
-                                echo "<option value='see notes'>See Notes</option>";
-                              } else {
-                                echo "<option value='see notes'>See Notes</option>";
-                                echo "<option value='lung fields clear'>LUNG FIELDS CLEAR</option>";
-                                echo "<option value='unfit due to x-ray findings'>Unfit Due to X-Ray Findings.</option>";
+                              foreach ($options as $key => $value) {
+                                  
+                                  if($key == $xray_chest)
+                                    echo "<option selected='selected' value='".$key."'>".$value."</option>";
+                                  else
+                                    echo "<option value='".$key."'>".$value."</option>";
                               }
+
+                              // if($xray_chest=='lung fields clear') {
+                              //   echo "<option value='$xray_chest' selected>LUNG FIELDS CLEAR</option>";
+                              //   echo "<option value='unfit due to x-ray findings'>Unfit Due to X-Ray Findings.</option>";
+                              //   echo "<option value='see notes'>See Notes</option>";
+                              // } elseif($xray_chest=='unfit due to x-ray findings') {
+                              //   echo "<option value='$xray_chest' selected=selected>Unfit Due to X-Ray Findings.</option>";
+                              //   echo "<option value='lung fields clear'>LUNG FIELDS CLEAR</option>";
+                              //   echo "<option value='see notes'>See Notes</option>";
+                              // } else {
+                              //   echo "<option value='see notes'>See Notes</option>";
+                              //   echo "<option value='lung fields clear'>LUNG FIELDS CLEAR</option>";
+                              //   echo "<option value='unfit due to x-ray findings'>Unfit Due to X-Ray Findings.</option>";
+                              // }
                               
                             ?>
                             <!-- <option value="lung fields clear">LUNG FIELDS CLEAR</option>
@@ -162,11 +161,25 @@ include_once('include/head.php');
                           </select>
                       </div>
                     </div>
-
+                    <div class="col-md-6">
+                      <?php 
+                          if($xray_image!='') {
+                            echo "<img class='img-thumbnail' alt='Image placeholder' height=300 width=210 src='candidate_xray/$xray_image'>";
+                          }
+                          else{
+                        ?>
+                          <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="xray_file" name="xray_file" lang="en">
+                            <label class="custom-file-label" for="xray_file">Select file</label>
+                          </div>
+                      <?php 
+                          }
+                        ?>
+                    </div>
                     <div class="col-md-6">
                       <div class="form-group">
                         <label class="form-control-label" for="exampleDatepicker">Remarks </label>
-                          <textarea class="form-control" name="xray_notes" rows = "5" cols = "80" id="remarks"><?php echo $xray_notes; ?></textarea>
+                          <textarea class="form-control" name="xray_notes" rows = "3" cols = "80" id="remarks"><?php echo $xray_notes; ?></textarea>
                       </div>
                     </div>
 

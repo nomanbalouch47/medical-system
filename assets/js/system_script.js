@@ -107,50 +107,121 @@ function set_portion(){
 }
 
 function get_candidate_record(e,btnname)
-    {
-      
-      e.which = e.which || e.keyCode;
-      if(e.which == 13)
-      {
-        //alert(btnname);
-        //var button_name = btnname;
-        var form_name = "Candidate_Info";
-        var barcode_num = document.getElementById('barcode').value;
-        var serial_num = document.getElementById('serial').value;
+{
+  
+  e.which = e.which || e.keyCode;
+  if(e.which == 13)
+  {
+    //alert(btnname);
+    //var button_name = btnname;
+    var form_name = "Candidate_Info";
+    var barcode_num = document.getElementById('barcode').value;
+    var serial_num = document.getElementById('serial').value;
 
-        if (document.getElementById('search_with_date')) {
-          var date_value = document.getElementById('search_with_date').value;
-        } else {
-          var date_value = "";
-        }
-        
-        var processID = document.getElementById('processid').value;
-
-        $(document).ready(function() {
-
-                   $.ajax({
-                      url: '././include/functions.php',
-                      type: 'POST',
-                      data: {
-                       
-                       process_ID : processID,
-                       barcode_num : barcode_num, 
-                       serial_num : serial_num,
-                       date_value : date_value, 
-                       form_name : form_name,
-                       btn : btnname,
-                       
-                         },
-                      success: function(data) {
-                          $('#cand_result').html(data);
-                      },
-                      error: function(XMLHttpRequest, textStatus, errorThrown) {
-                          //case error                    
-                        }
-                  });
-          });
-      }
+    if (document.getElementById('search_with_date')) {
+      var date_value = document.getElementById('search_with_date').value;
+    } else {
+      var date_value = "";
     }
+    
+    var processID = document.getElementById('processid').value;
+
+    $(document).ready(function() {
+
+               $.ajax({
+                  url: '././include/functions.php',
+                  type: 'POST',
+                  data: {
+                   
+                   process_ID : processID,
+                   barcode_num : barcode_num, 
+                   serial_num : serial_num,
+                   date_value : date_value, 
+                   form_name : form_name,
+                   btn : btnname,
+                   
+                     },
+                  success: function(data) {
+                      $('#cand_result').html(data);
+                  },
+                  error: function(XMLHttpRequest, textStatus, errorThrown) {
+                      //case error                    
+                    }
+              });
+      });
+  }
+}
+
+function get_candidate_medical_status(e,btnname)
+{
+  
+    e.which = e.which || e.keyCode;
+    if(e.which == 13)
+    {
+      //alert(btnname);
+
+      var form_name = "Candidate Medical Status";
+      var serial_num = document.getElementById('serial').value;
+      var date_value = document.getElementById('search_with_date').value;
+      
+
+      $(document).ready(function() {
+
+                 $.ajax({
+                    url: '././include/functions.php',
+                    type: 'POST',
+                    data: {
+                     
+                     serial_num : serial_num,
+                     date_value : date_value, 
+                     form_name : form_name,
+                     btn : btnname,
+                     
+                       },
+                    success: function(data) {
+                        $('#cand_result').html(data);
+                    },
+                    error: function(XMLHttpRequest, textStatus, errorThrown) {
+                        //case error                    
+                      }
+                });
+        });
+    }
+}
+
+// function change_candidate_medical_status()
+// {
+//       var form_name="Change Medical Status";
+//       var status_remarks = document.getElementById("status_remarks").value;
+//       var reg_id = document.getElementById("reg_id").value;
+//       var final_status = document.getElementById("final_status").value;
+        
+//       if(document.getElementById("status_remarks")) {  
+
+//         var form_array = [reg_id,final_status,status_remarks];
+
+//         $.ajax({
+//               url: '././include/functions.php',
+//               type: 'POST',
+//               data: {
+               
+//                form_values : form_array, 
+//                form_name : form_name,
+
+//                  },
+//               success: function(data) {
+//                   $('#respond_lab_result').html(data);
+//               },
+//               error: function(XMLHttpRequest, textStatus, errorThrown) {
+//                   //case error                    
+//                 }
+//           });
+//       }
+//       else {
+//         alert('Remarks is mandatory!')
+//       }
+
+// }
 
 function lab_result_update()
 {
@@ -271,7 +342,7 @@ function verfiy_barcode_lab_result(e)
                      
                        },
                     success: function(data) {
-                        $('#barcode_verification_response').html(data);
+                        $('#cand_result').html(data);
                     },
                     error: function(XMLHttpRequest, textStatus, errorThrown) {
                         //case error                    
@@ -646,6 +717,42 @@ function check_lab_sticker(e,usertype){
 
 }
 
+function change_lab_sticker_attempts(e,usertype){
+  e.which = e.which || e.keyCode;
+      if(e.which == 13){
+
+        var form_name = "Change Lab Sticker Attempts";
+        var reg_date = document.getElementById('reg_date').value;
+        var serial_no = document.getElementById('serial_no').value;
+        var login_id = document.getElementById('loginid').value;
+
+        $(document).ready(function() {
+
+                   $.ajax({
+                      url: '././include/functions.php',
+                      type: 'POST',
+                      data: {
+                       
+                       form_name : form_name,
+                       reg_date : reg_date,
+                       serial_no : serial_no,
+                       loginID : login_id,
+                       UserType : usertype,
+                       
+                         },
+                      success: function(data) {
+                          $('#barcode_result').html(data);
+                      },
+                      error: function(XMLHttpRequest, textStatus, errorThrown) {
+                          //case error                    
+                        }
+                  });
+          });
+
+      }
+
+}
+
 
 function allow_duplicate_sticker(sticker1){
 
@@ -741,6 +848,8 @@ function cand_registration(){
               var CNIC = document.getElementById('cnic').value;
               var Remarks = document.getElementById('remarks').value;
              // var pregnancyTest = document.getElementById('pregnancy').value;
+              console.log('hi');
+             console.log(RegDate);
 
               if(document.getElementById('pregnancy').checked == true){
 
@@ -1048,8 +1157,9 @@ function printlabsticker()
               var form_name ="Print Lab Sticker 1";             
               var RegID = document.getElementById('reg_id').value;
               var Serial_NUM = document.getElementById('serial_no').value;
-              var Reg_date = document.getElementById('examination_date').value;            
-              var form_array = [RegID,Serial_NUM,Reg_date];
+              var Reg_date = document.getElementById('examination_date').value;
+              var processid = document.getElementById('processid').value;            
+              var form_array = [RegID,Serial_NUM,Reg_date,processid];
 
               $.ajax({
                     url: '././include/functions.php',

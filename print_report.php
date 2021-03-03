@@ -111,13 +111,15 @@ if(isset($_POST['find2'])){
         $medical_created_at = $row_data3['created_at'];
         $medicalstatus = $row_data3['medical_status'];
     }
-    if($medicalstatus == "FIT") {
-      $medical_progress =100;
-    } elseif($medicalstatus == "UNFIT") {
-      $medical_progress =0;
-    } else {
-      $medical_progress =50;
-    }
+    $medical_progress =100;
+    // if($medicalstatus == "FIT") {
+    //   $medical_progress =100;
+    // } elseif($medicalstatus == "UNFIT") {
+    //   $medical_progress =0;
+    // } else {
+    //   $medical_progress =50;
+    // }
+
     // if($color_vision == 'DEFECTIVE'){
 
     // }
@@ -128,7 +130,7 @@ if(isset($_POST['find2'])){
   $count_lab_sticker_check = mysqli_num_rows($lab_sticker);
   if($count_lab_sticker_check > 0){
  
-    $lab_progress = $lab_progress+50;
+    $lab_progress = 50;
 
     while($row_data4 = mysqli_fetch_array($lab_sticker)){
         $sticker_user_name = $row_data4['user_name'];
@@ -143,19 +145,22 @@ if(isset($_POST['find2'])){
   $lab_check = lab_check_notification($regid);
   $count_lab_check = mysqli_num_rows($lab_check);
   if($count_lab_check > 0){
-    $lab_progress = $lab_progress+50;
+    // $lab_progress = $lab_progress+50;
 
     while($row_data4 = mysqli_fetch_array($lab_check)){
         $lab_user_name = $row_data4['user_name'];
         $lab_created_at = $row_data4['created_at'];
         $labstatus = $row_data4['lab_status'];
         
-    } 
-    if($labstatus == "FIT") {
-      $lab_progress = 100;
-    } elseif($labstatus == "UNFIT") {
-      $lab_progress = 0;
-    } 
+    }
+    $lab_progress = 100;
+    // $lab_progress = 100; 
+    // if($labstatus == "FIT") {
+    //   $lab_progress = 100;
+    // } elseif($labstatus == "UNFIT") {
+    //   $lab_progress = 0;
+    // }
+
 
   }
   
@@ -178,18 +183,20 @@ if(isset($_POST['find2'])){
 
   } else{
       
-       // $xray_progress = $xray_progress+50;
+    $xray_progress = $xray_progress+50;
     while($row_data5 = mysqli_fetch_array($xray_result)){
         $xray_result_user_name = $row_data5['user_name'];
         $xray_result_created_at = $row_data5['created_on'];
         $xray_status = $row_data5['xray_status'];
     }
-    if($xray_status == "FIT") {
-      // echo "<script>alert('Xray FIT')</script>";
-      $xray_progress = 100;
-    } elseif($xray_status == "UNFIT") {
-      $xray_progress = $xray_progress+0;
-    }
+    $xray_progress = 100;
+    // $xray_progress = 100;
+    // if($xray_status == "FIT") {
+    //   // echo "<script>alert('Xray FIT')</script>";
+    //   $xray_progress = 100;
+    // } elseif($xray_status == "UNFIT") {
+    //   $xray_progress = $xray_progress+0;
+    // }
   }
  
 
@@ -437,7 +444,7 @@ if(isset($_POST['find2'])){
                     <div class="col-md-6">
                       <span class="h2 font-weight-bold mb-0">Pending</span>
                       <label class="custom-toggle">
-                        <input type="checkbox" id="pending" <?php if ($medical_status == 'Pending'){?> checked="checked" <?php } ?>  onchange="pending_status();">
+                        <input type="checkbox" id="pending" <?php if ($medical_status == 'Pending'){?> checked="checked" <?php } ?>  onclick="pending_status();">
                         <span class="custom-toggle-slider rounded-circle"></span>
                       </label>
                     </div>
@@ -490,10 +497,17 @@ if(isset($_POST['find2'])){
                           echo "<div class='badge badge-danger d-block' id='medical_status'>Pending 
                                 </div>";
                        }
-                       else{
+                       elseif ($medical_status == 'UNFIT'){
 
                           
                           echo "<div class='badge badge-danger d-block' id='medical_status'>UNFIT 
+                                </div>";
+                       }
+ 
+                       else{
+
+                          
+                          echo "<div class='badge badge-danger d-block' id='medical_status'>&nbsp; 
                                 </div>";
                         
                        }
@@ -987,23 +1001,23 @@ include_once('include/footer.php');
 <script type="text/javascript">
  function pending_status(){
   //var current_status = document.getElementById("medical_status").innerHTML;
+  var reg_id = document.getElementById('regid').value;
+  var form_name = "Update Medical Status";
 
   if(document.getElementById("pending").checked == true)
   {
-
-    var reg_id = document.getElementById('regid').value;
-    var form_name = "Update Medical Status";
-    var medstatus = 'Pending';
-
-  $(document).ready(function() {
-
+    
+    var medicalstatus = 'Pending';
+      
+        $(document).ready(function() {
+            
                    $.ajax({
                       url: '././include/functions.php',
                       type: 'POST',
                       data: {
                        form_name : form_name,
                        regID : reg_id,
-                       medicalstatus :medstatus,
+                       medicalstatus :medicalstatus,
                          },
                       success: function(data) {
                           // $('#portion_update').html(data);
@@ -1017,19 +1031,18 @@ include_once('include/footer.php');
 
     
   }else{
-    var reg_id = document.getElementById('regid').value;
-    var form_name = "Update Medical Status";
-    var medstatus = 'Not Pending';
-    
-      $(document).ready(function() {
 
+    var medicalstatus = 'Not Pending';
+      
+      $(document).ready(function() {
+            
                    $.ajax({
                       url: '././include/functions.php',
                       type: 'POST',
                       data: {
                        form_name : form_name,
                        regID : reg_id,
-                       medicalstatus :medstatus,
+                       medicalstatus :medicalstatus,
                          },
                       success: function(data) {
                           // $('#portion_update').html(data);

@@ -91,7 +91,11 @@ include_once('include/head.php');
                     </div>
                     <!--  -->
                   </div>
-                <input type="submit" class="btn btn-success" name="create_user" value="Create">
+                  <button name="create_user" class="btn btn-icon btn-success my-2" type="submit">
+                    <span class="btn-inner--icon"><i class="ni ni-active-40"></i></span>
+                    <span class="btn-inner--text">Create</span>
+                  </button>
+                <!-- <input type="submit" class="btn btn-success" name="create_user" value="Create"> -->
                 <input type="submit" class="btn btn-danger" name="update_user" value="Update">
                 </form>
                 <?php edit_user(); ?>

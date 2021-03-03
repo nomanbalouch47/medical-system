@@ -104,7 +104,7 @@ include_once('include/head.php');
               <div class="col-md-6">
                 <div class="form-group">                        
                     <label class="form-control-label">Serial No</label>
-                    <input class="form-control" type="text" name="serial" id="serial">     
+                    <input class="form-control" type="text" placeholder="serial number" name="serial" id="serial">     
                     <input type="hidden" name="loginid" id="loginid" value="<?php echo $loginuser; ?>">
                     <input type="hidden" name="center_id" id="center_id" value="<?php echo $center_id; ?>">
                 </div>
@@ -128,6 +128,7 @@ include_once('include/head.php');
                       <option value="">-- select --</option>
                       <option value="lung fields clear">LUNG FIELDS CLEAR</option>
                       <option value="unfit due to x-ray findings">Unfit Due to X-Ray Findings.</option>
+                      <option value="repeat">Repeat</option>
                       <option value="see notes">"See Notes"</option>
                     </select>
                 </div>
@@ -181,7 +182,7 @@ include_once('include/head.php');
               <div class="col-md-6">
                 <div class="form-group">                        
                     <label class="form-control-label">Serial No</label>
-                    <input class="form-control" type="text" name="serial2" id="serial2"> 
+                    <input class="form-control" type="text" placeholder="serial number" name="serial2" id="serial2"> 
                     <input type="hidden" name="loginid" id="loginid" value="<?php echo $loginuser; ?>">
                     <input type="hidden" name="center_id" id="center_id" value="<?php echo $center_id; ?>">
                 </div>

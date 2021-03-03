@@ -22,7 +22,7 @@ date_default_timezone_set("Asia/Karachi");
 $time = date("d-m-y h:i:s A");
 $today_date = date("Y-m-d");
 $current_year =date("Y");
-$today_date_for_datepicker = date("m/d/Y");
+$today_date_for_datepicker = date("d/m/Y");
 $today_date_with_time = date("Y-m-d H:i:s");
 $title = "Medical System";
 $token_prefix= "M";
@@ -142,7 +142,7 @@ function now_serving_rights($loginID,$moduleID){
 function print_lab_sticker_rights($loginID,$moduleID){
   global $data;
   global $center_id;
-  $check_rights = $data->query("select print_lab_sticker from user_action_rights where user_id='$loginID' and module_id='$moduleID' and center_id='$center_id' and print_lab_sticker='1'");
+  $check_rights = $data->query("select lab_sticker from user_action_rights where user_id='$loginID' and module_id='$moduleID' and center_id='$center_id' and lab_sticker_attempts!='0'");
   $count_rows= mysqli_num_rows($check_rights);
   if($count_rows > 0){
     return 1;
@@ -338,132 +338,422 @@ if(isset($_POST['form_name']))
       }
       else{
 
-      while ($row_data = mysqli_fetch_array($get_cand_data)) {
-        $regid = $row_data['reg_id'];
-        $passport_no = $row_data['passport_no'];
-        $candidate_name = $row_data['candidate_name'];
-        $son_of = $row_data['son_of'];
-        $country = $row_data['country'];
-        $serial_no = $row_data['serial_no'];
-        $barcode = $row_data['barcode_no'];
-        $cnic = $row_data['cnic'];
-        $pregnancy_test = $row_data['pregnancy_test'];
-        $reg_date = $row_data['reg_date'];
-        $candimage = $row_data['candidate_img'];
-        $token_no = $row_data['token_no'];
+        while ($row_data = mysqli_fetch_array($get_cand_data)) {
+          $regid = $row_data['reg_id'];
+          $passport_no = $row_data['passport_no'];
+          $candidate_name = $row_data['candidate_name'];
+          $son_of = $row_data['son_of'];
+          $country = $row_data['country'];
+          $serial_no = $row_data['serial_no'];
+          $barcode = $row_data['barcode_no'];
+          $cnic = $row_data['cnic'];
+          $pregnancy_test = $row_data['pregnancy_test'];
+          $reg_date = $row_data['reg_date'];
+          $candimage = $row_data['candidate_img'];
+          $token_no = $row_data['token_no'];
 
-        if($pregnancy_test == '1'){
-          alert_box("Follow the SOP for Pregnant Female");
-        }          
-                  
-    }
-
-    //biometric token work 13feb2020
-    $get_token_queue = $data->query("select q_id from tb_queue_manager where token_no='$token_no' and process_id='$process_ID' and status='Pending' and process_date='$today_date'");
-    $row_que = mysqli_fetch_array($get_token_queue);
-    $q_id = $row_que['q_id'];
-
-    $insert_token = array(
-                'token_no' => mysqli_real_escape_string($data->con, $token_no),
-                'process_id' => mysqli_real_escape_string($data->con, $process_ID),
-                'q_id' => mysqli_real_escape_string($data->con, $q_id),
-                'token_date' => mysqli_real_escape_string($data->con, $today_date)
-                
-            );
-
-          $data->insert('tb_ongoing_tokens', $insert_token);
-    //end
-
-    echo"<div class='row'>
-                    <div class='col-md-6'>
-                      <div class='form-group'>                        
-                          <label class='form-control-label'>Examination Date</label>
-                          <input class='form-control' type='text' value='$reg_date' id='examination_date' readonly>
-                      </div>
-                    </div>
-                    <div class='col-md-6'>
-                      <div class='form-group'>                     
-                          <label class='form-control-label' for='exampleDatepicker'>Serial Number</label>
-                          <input class='form-control' type='text' id='serial_no' value='$serial_no' readonly>
-                      </div>
-                    </div>
-                  </div>
-                  <div class='row'>
-                    <div class='col-md-6'>
-                      <div class='form-group'>
-                          <label class='form-control-label'>Name</label>  
-                          <input class='form-control' type='text' value='$candidate_name' readonly>
-                      </div>
-                    </div>
-                    <div class='col-md-6'>
-                      <div class='form-group'>
-                          <label class='form-control-label'>Father Name</label>  
-                          <input class='form-control' type='text' value='$son_of' readonly>
-                      </div>
-                    </div>
-                    </div>
-                  <div class='row'>
-                    <div class='col-md-6'>
-                      <div class='form-group'>
-                          <label class='form-control-label' for='exampleDatepicker'>PP No</label>  
-                          <input class='form-control' type='text' value='$passport_no' readonly>
-                      </div>
-                    </div>
-                     <div class='col-md-6'>
-                      <div class='form-group'>
-                          <label class='form-control-label'>CNIC</label>  
-                          <input class='form-control' type='text' value='$cnic' readonly>
-                      </div>
-                    </div>
-                  </div>
-                 
-                  <div class='row'>
-                   <div class='col-md-6'>
-                          <div class='form-group'>
-                              <label class='form-control-label' for='exampleDatepicker'>Country</label>
-                              <input class='form-control' type='text' value='$country' readonly>                            
-                        </div>
-                      </div>
-                      <div class='col-md-6'>
-                          <div class='form-group'>
-                              
-                              <input class='form-control' type='hidden' value='$regid' name='reg_id' id='reg_id' readonly>
-
-                              <input class='form-control' type='text' value='$token_no' name='cand_token' id='cand_token' readonly>
-
-                        </div>
-                      </div>
-                  </div>";
-                  ?>
-
-                  <script type="text/javascript">
-                   
-                    document.getElementById('cand_img').src='assets/candidate_image/<?php echo $candimage ?>';
-                    var reg_token_no = '<?php echo $token_no ?>';
-                    document.getElementById('cand_img').src='assets/candidate_image/<?php echo $candimage ?>';
-                    document.getElementById("token_number").innerHTML = reg_token_no;
-                  </script>
-
-                  <?php
-
-        if($button_name == "samplecollection")
-        {
-            $sample_collected = $data->query("select * from sample_collection where reg_id='$regid'");
-            $count_result2 = mysqli_num_rows($sample_collected);
-            if($count_result2  > 0){
-              alert_box("Blood Sample Already Collected.");
-            }   
+          if($pregnancy_test == '1'){
+            alert_box("Follow the SOP for Pregnant Female");
+          }          
+                    
         }
 
-          ?>
-                  <script type="text/javascript">
-                    var form_button = '<?php echo $button_name ?>';
-                    document.getElementById(form_button).style.display = "block";  
-                  </script>
+        //biometric token work 13feb2020
+        $get_token_queue = $data->query("select q_id from tb_queue_manager where token_no='$token_no' and process_id='$process_ID' and status='Pending' and process_date='$today_date'");
+        $row_que = mysqli_fetch_array($get_token_queue);
+        $q_id = $row_que['q_id'];
 
-                  <?php
-                  
+        $insert_token = array(
+                    'token_no' => mysqli_real_escape_string($data->con, $token_no),
+                    'process_id' => mysqli_real_escape_string($data->con, $process_ID),
+                    'q_id' => mysqli_real_escape_string($data->con, $q_id),
+                    'token_date' => mysqli_real_escape_string($data->con, $today_date)
+                    
+                );
+
+              $data->insert('tb_ongoing_tokens', $insert_token);
+        //end
+
+        echo"<div class='row'>
+                        <div class='col-md-6'>
+                          <div class='form-group'>                        
+                              <label class='form-control-label'>Examination Date</label>
+                              <input class='form-control' type='text' value='$reg_date' id='examination_date' readonly>
+                          </div>
+                        </div>
+                        <div class='col-md-6'>
+                          <div class='form-group'>                     
+                              <label class='form-control-label' for='exampleDatepicker'>Serial Number</label>
+                              <input class='form-control' type='text' id='serial_no' value='$serial_no' readonly>
+                          </div>
+                        </div>
+                      </div>
+                      <div class='row'>
+                        <div class='col-md-6'>
+                          <div class='form-group'>
+                              <label class='form-control-label'>Name</label>  
+                              <input class='form-control' type='text' value='$candidate_name' readonly>
+                          </div>
+                        </div>
+                        <div class='col-md-6'>
+                          <div class='form-group'>
+                              <label class='form-control-label'>Father Name / Husband Name</label>  
+                              <input class='form-control' type='text' value='$son_of' readonly>
+                          </div>
+                        </div>
+                        </div>
+                      <div class='row'>
+                        <div class='col-md-6'>
+                          <div class='form-group'>
+                              <label class='form-control-label' for='exampleDatepicker'>PP No</label>  
+                              <input class='form-control' type='text' value='$passport_no' readonly>
+                          </div>
+                        </div>
+                         <div class='col-md-6'>
+                          <div class='form-group'>
+                              <label class='form-control-label'>CNIC</label>  
+                              <input class='form-control' type='text' value='$cnic' readonly>
+                          </div>
+                        </div>
+                      </div>
+                     
+                      <div class='row'>
+                       <div class='col-md-6'>
+                              <div class='form-group'>
+                                  <label class='form-control-label' for='exampleDatepicker'>Country</label>
+                                  <input class='form-control' type='text' value='$country' readonly>                            
+                            </div>
+                          </div>
+                          <div class='col-md-6'>
+                              <div class='form-group'>
+                                  
+                                  <input class='form-control' type='hidden' value='$regid' name='reg_id' id='reg_id' readonly>
+
+                                  <input class='form-control' type='text' value='$token_no' name='cand_token' id='cand_token' readonly>
+
+                            </div>
+                          </div>
+                      </div>";
+                      ?>
+
+                      <script type="text/javascript">
+                       
+                        document.getElementById('cand_img').src='assets/candidate_image/<?php echo $candimage ?>';
+                        var reg_token_no = '<?php echo $token_no ?>';
+                        document.getElementById('cand_img').src='assets/candidate_image/<?php echo $candimage ?>';
+                        document.getElementById("token_number").innerHTML = reg_token_no;
+                      </script>
+
+                      <?php
+
+            if($button_name == "samplecollection")
+            {
+                $sample_collected = $data->query("select * from sample_collection where reg_id='$regid'");
+                $count_result2 = mysqli_num_rows($sample_collected);
+                if($count_result2  > 0){
+                  alert_box("Blood Sample Already Collected.");
+                }   
+            }
+
+                    ?>
+
+                      <script type="text/javascript">
+                        var form_button = '<?php echo $button_name ?>';
+                        document.getElementById(form_button).style.display = "block";  
+                      </script>
+
+                    <?php
+                    
+        }
     }
+
+  if($_POST['form_name'] == 'Candidate Medical Status')
+  {
+       
+       $serial = $_POST['serial_num'];
+       $date_value = date('Y-m-d', strtotime($_POST['date_value']));
+       $button_name = $_POST['btn'];
+
+       $medical_status_arr = array('FIT','UNFIT','Pending','In Process');
+
+          $get_cand_data = $data->query("select DISTINCT r.token_no,r.reg_id,r.reg_date,r.passport_no,r.candidate_name,r.son_of,r.country,r.serial_no,r.cnic,r.candidate_img,r.pregnancy_test,l.sticker_value_2,lr.barcode,r.medical_status as final_status,mo.medical_status,xr.xray_status,lr.lab_status
+            from tb_registration r
+            left join tb_medical mo ON mo.reg_id=r.reg_id
+            left join tb_xray_result xr ON xr.reg_id=r.reg_id
+            left join tb_lab_sticker l ON l.reg_id=r.reg_id
+            left join tb_lab_result lr ON (lr.reg_id=r.reg_id || lr.barcode=l.sticker_value_2)
+            where r.serial_no='$serial' and r.reg_date='$date_value' and r.country != 'case cancelled'");
+
+      
+      $count_result = mysqli_num_rows($get_cand_data);
+      if($count_result  == 0)
+      {
+        echo show_message(0,"No record found.");
+        
+            ?>
+              <script type="text/javascript">
+                 var form_button = '<?php echo $button_name ?>';
+                document.getElementById(form_button).style.disabled = true;  
+              </script>
+            <?php
+
+      }
+      else{
+
+            ?>
+              <script type="text/javascript">
+                document.getElementById('verify_success').style.display = "block";  
+              </script>
+            <?php
+
+        while ($row_data = mysqli_fetch_array($get_cand_data)) {
+
+          $token_no = $row_data['token_no'];
+          $regid = $row_data['reg_id'];
+          $passport_no = $row_data['passport_no'];
+          $candidate_name = $row_data['candidate_name'];
+          $son_of = $row_data['son_of'];
+          $country = $row_data['country'];
+          $serial_no = $row_data['serial_no'];
+          $cnic = $row_data['cnic'];
+          $pregnancy_test = $row_data['pregnancy_test'];
+          $reg_date = $row_data['reg_date'];
+          $candimage = $row_data['candidate_img'];
+          $sticker_value_2 = $row_data['sticker_value_2'];
+          $barcode = $row_data['barcode'];
+          $final_status = $row_data['final_status'];
+          $medical_status = $row_data['medical_status'];
+          $xray_status = $row_data['xray_status'];
+          $lab_status = $row_data['lab_status'];
+
+
+          if($pregnancy_test == '1'){
+            alert_box("Follow the SOP for Pregnant Female");
+          }          
+                    
+        }
+        $regDate= date('d-m-Y',strtotime($reg_date));
+
+          echo "<div class='col-lg-12'>
+            <div class='card-wrapper'>
+            <div class='card'>
+              <div class='card-header'>
+                <h3 class='mb-0'>CANDIDATE INFO</h3>
+              </div>
+              <div class='card-body'>
+                <form>
+                <div class='row'>
+                  <div class='col-md-12'>
+                    <div class='form-group'>
+                      <img src='assets/candidate_image/$candimage' id='cand_img' alt='...'' class='img-thumbnail'>
+                    </div>
+                  </div>
+                  <div class='col-md-6'>
+                    <div class='form-group'>                        
+                      <label class='form-control-label'>Examination Date</label>
+                      <input class='form-control' type='text' value='$regDate' id='examination_date' readonly>
+                    </div>
+                  </div>
+                  <div class='col-md-6'>
+                    <div class='form-group'>                     
+                      <label class='form-control-label'>Serial Number</label>
+                      <input class='form-control' type='text' id='serial_no' value='$serial_no' readonly>
+                    </div>
+                  </div>
+                </div>
+                <div class='row'>
+                  <div class='col-md-6'>
+                    <div class='form-group'>
+                      <label class='form-control-label'>Name</label>  
+                      <input class='form-control' type='text' value='$candidate_name' readonly>
+                    </div>
+                  </div>
+                  <div class='col-md-6'>
+                    <div class='form-group'>
+                      <label class='form-control-label'>Father Name / Husband Name</label>  
+                      <input class='form-control' type='text' value='$son_of' readonly>
+                    </div>
+                  </div>
+                  </div>
+                <div class='row'>
+                  <div class='col-md-6'>
+                    <div class='form-group'>
+                      <label class='form-control-label'>PP No</label>  
+                      <input class='form-control' type='text' value='$passport_no' readonly>
+                    </div>
+                  </div>
+                   <div class='col-md-6'>
+                    <div class='form-group'>
+                      <label class='form-control-label'>CNIC</label>  
+                      <input class='form-control' type='text' value='$cnic' readonly>
+                    </div>
+                  </div>
+                </div>
+               
+                <div class='row'>
+                  <div class='col-md-6'>
+                    <div class='form-group'>
+                      <label class='form-control-label'>Country</label>
+                      <input class='form-control' type='text' value='$country' readonly>                            
+                    </div>
+                  </div>
+                  <div class='col-md-6'>
+                    <div class='form-group'>  
+                      <label class='form-control-label'>Token Number</label>
+                      <input class='form-control' type='text' value='$token_no' name='cand_token' id='cand_token' readonly>
+                      <input type='hidden' value='$regid' name='reg_id' id='reg_id'>
+                    </div>
+                  </div>
+                </div>
+
+                <div class='row'>
+                  <div class='col-md-3'>
+                    <div class='form-group'>
+                      <label class='form-control-label'>Medical Status</label>
+                      <input class='form-control' type='text' value='$medical_status' readonly>                            
+                    </div>
+                  </div>
+                  <div class='col-md-3'>
+                    <div class='form-group'>  
+                      <label class='form-control-label'>Xray Status</label>
+                      <input class='form-control' type='text' value='$xray_status' readonly>   
+                    </div>
+                  </div>
+                  <div class='col-md-3'>
+                    <div class='form-group'>  
+                      <label class='form-control-label'>Lab Status</label>
+                      <input class='form-control' type='text' value='$lab_status' readonly>   
+                    </div>
+                  </div>
+                  <div class='col-md-3'>
+                    <div class='form-group'>  
+                      <label class='form-control-label'>Final Status</label>";
+                      if($final_status=='FIT') {
+                      echo "<span class='badge badge-success d-block' id='current_status' style='padding: 8px; font-size: 20px;'>FIT 
+                                </span>";
+                      }
+                      elseif($final_status=='Pending') {
+                        echo "<span class='badge badge-warning d-block' id='current_status' style='padding: 8px; font-size: 20px;'>Pending 
+                                  </span>";
+                      }
+                      elseif($final_status=='In Process') {
+                        echo "<span class='badge badge-warning d-block' id='current_status' style='padding: 8px; font-size: 20px;'>In Process 
+                                  </span>"; 
+                      }
+                      else {
+                        echo "<span class='badge badge-danger d-block' id='current_status' style='padding: 8px; font-size: 20px;'>NOT MATCHED 
+                                  </span>";
+                      }
+                    echo "</div>
+                  </div>
+                </div>
+
+                <div class='row'>
+                  <div class='col-md-3'>
+                    <div class='form-group'>
+                      <label class='form-control-label'>Lab Sticker Printed</label>
+                      <input class='form-control' type='text' value='$sticker_value_2' readonly>                            
+                    </div>
+                  </div>
+                  <div class='col-md-3'>
+                    <div class='form-group'>  
+                      <label class='form-control-label'>Lab Sticker Readed</label>
+                      <input class='form-control' type='text' value='$barcode' readonly>   
+                    </div>
+                  </div>
+                  <div class='col-md-3'>
+                    <div class='form-group'>
+                    <label class='form-control-label'>Status</label>";  
+                    if($sticker_value_2==$barcode) {
+                      echo "<span class='badge badge-success d-block' id='sticker_matched' style='padding: 8px; font-size: 20px;'>MATCHED 
+                                </span>";
+                    } else {
+                      echo "<span class='badge badge-danger d-block' id='sticker_matched' style='padding: 8px; font-size: 20px;'>NOT MATCHED 
+                                </span>";
+                    }
+              echo "</div>
+                  </div>
+                </div>
+
+                <div class='row'>
+                  <div class='col-md-12'>
+                    <div class='form-group'>
+                      <label class='form-control-label'>Final Status</label>
+                      <select class='form-control' data-toggle='select' id='final_status' name='final_status'>";
+                        
+                        foreach ($medical_status_arr as $value) {
+                          
+                          if($final_status==$value)
+                            echo "<option value='$final_status' selected=selected>$final_status</option>";
+                          else
+                            echo "<option value='$value'>$value</option>";
+
+                        }
+                        
+                      echo "</select>
+                    </div>
+                  </div>
+                </div> 
+
+                <div class='row'>
+                  <div class='col-md-12'>
+                    <div class='form-group'>
+                      <label class='form-control-label' for='status_remarks'>Remarks ( <span class='badge badge-danger'>required</span> )</label>
+                      <textarea class='form-control' id='status_remarks' rows='3' placeholder='Note the reason for changing status here...' required='required'></textarea>
+                    </div>
+                  </div>
+                </div>
+
+                </form>
+              
+                  <button type='button' id='change_result' class='btn btn-primary' onclick='change_candidate_medical_status();'>
+                    <span class='btn-inner--icon'><i class='ni ni-check-bold'></i> Change Result</span>
+                  </button>
+
+              </div>
+              <span id='saved_successfully'></span>
+            </div>
+          </div>
+        </div>
+        <script>
+          function change_candidate_medical_status()
+          {
+                var form_name='Change Medical Status';
+                var status_remarks = document.getElementById('status_remarks').value;
+                var reg_id = document.getElementById('reg_id').value;
+                var final_status = document.getElementById('final_status').value;
+                  
+                if(document.getElementById('status_remarks').value != '') {  
+
+                  var form_array = [reg_id,final_status,status_remarks];
+
+                  $.ajax({
+                        url: '././include/functions.php',
+                        type: 'POST',
+                        data: {
+                         
+                         form_values : form_array, 
+                         form_name : form_name,
+
+                           },
+                        success: function(data) {
+                            $('#saved_successfully').html(data);
+                        },
+                        error: function(XMLHttpRequest, textStatus, errorThrown) {
+                            //case error                    
+                          }
+                    });
+                }
+                else {
+                  alert('Remarks is mandatory!');
+                }
+
+          }
+        </script>";
+
+              
+          
+        }
   }
 
   if($_POST['form_name'] == 'Verify Barcode Lab Result')
@@ -471,343 +761,327 @@ if(isset($_POST['form_name']))
        $barcode = $_POST['barcode_num'];
        $process_ID = $_POST['process_ID'];
 
-      $get_cand_data = $data->query("select `reg_id`,`sticker_value_2` from tb_lab_sticker where `sticker_value_2`='$barcode'");
-      
-      $count_result = mysqli_num_rows($get_cand_data);
-      if($count_result  == 0)
-      {
-        // echo show_message(1,"No record found.");
-        // echo "<script>alert('hi')</script>";
-        ?>
-         <script type="text/javascript">
-            document.getElementById('barcodeError').style.display = "block";
-            document.getElementById('lab_result_form').disabled = true;
-            
-          </script>
-
-        <?php
-      }
-      else{
-
-        //check already exist in lab result
-
-         $get_lab_Result = $data->query("select `reg_id`,`barcode` from tb_lab_result where `barcode`='$barcode'");
-
-         $count_num = mysqli_num_rows($get_lab_Result);
-         if($count_num > 0){
-
+        $get_cand_data = $data->query("select `reg_id`,`sticker_value_2` from tb_lab_sticker where `sticker_value_2`='$barcode'");
+        
+        $count_result = mysqli_num_rows($get_cand_data);
+        if($count_result  == 0)
+        {
+          // echo show_message(1,"No record found.");
+          // echo "<script>alert('hi')</script>";
           ?>
-              <script type="text/javascript">
-                document.getElementById('alreadyexistError').style.display = "block";
-                document.getElementById('lab_result_form').disabled = true;
-                
-              </script>
+           <script type="text/javascript">
+              document.getElementById('barcodeError').style.display = "block";
+              document.getElementById('barcodeSuccess').style.display = "none";
+              document.getElementById('lab_result_form').disabled = true;
+              
+            </script>
 
           <?php
-         }else{
+        }
+        else{
 
-                  while ($row_data = mysqli_fetch_array($get_cand_data)) {
-                    $regid = $row_data['reg_id'];
-                    $sticker_value_2 = $row_data['sticker_value_2'];
-                              
-                  }
+          //check already exist in lab result
 
-                    ?>
+           $get_lab_Result = $data->query("select `reg_id` as REGID,`barcode` from tb_lab_result where `barcode`='$barcode'");
 
-                      <script type="text/javascript">
-                        document.getElementById('barcode').value='<?php echo $sticker_value_2 ?>';
-                        document.getElementById('reg_id').value='<?php echo $regid ?>';
-                       
-                      </script>
+           $count_num = mysqli_num_rows($get_lab_Result);
+           if($count_num > 0){
 
-                    <?php
-
-
-
-          }
+            ?>
+                <script type="text/javascript">
+                  document.getElementById('alreadyexistError').style.display = "block";
+                  document.getElementById('lab_result_form').disabled = true;
                   
-      }
+                </script>
+
+            <?php
+           }
+           else{
+
+                while ($row_data = mysqli_fetch_array($get_cand_data)) {
+                  $regid = $row_data['reg_id'];
+                  $sticker_value_2 = $row_data['sticker_value_2'];
+                            
+                }
+
+            $get_cand_data = $data->query("select token_no,reg_id,reg_date,passport_no,candidate_name,son_of,country,barcode_no,serial_no,cnic,candidate_img,pregnancy_test from tb_registration where reg_id='$regid' and country != 'case cancelled'");
+
+        
+            $count_result = mysqli_num_rows($get_cand_data);
+            if($count_result  == 0)
+            {
+              echo show_message(0,"No record found.");
+              
+                  ?>
+                        <script type="text/javascript">
+                           var form_button = '<?php echo $button_name ?>';
+                          document.getElementById(form_button).style.display = "none";  
+                        </script>
+                  <?php
+
+            }
+            else{
+
+            while ($row_data = mysqli_fetch_array($get_cand_data)) {
+              $regid = $row_data['reg_id'];
+              $passport_no = $row_data['passport_no'];
+              $candidate_name = $row_data['candidate_name'];
+              $son_of = $row_data['son_of'];
+              $country = $row_data['country'];
+              $serial_no = $row_data['serial_no'];
+              $barcode = $row_data['barcode_no'];
+              $cnic = $row_data['cnic'];
+              $pregnancy_test = $row_data['pregnancy_test'];
+              $reg_date = $row_data['reg_date'];
+              $candimage = $row_data['candidate_img'];
+              $token_no = $row_data['token_no'];
+
+              if($pregnancy_test == '1'){
+                alert_box("Follow the SOP for Pregnant Female");
+              }          
+                        
+          }
+
+
+            echo"<div class='row'>
+                      <div class='col-md-12'>
+                          <div class='form-group'>
+                            <img src='assets/candidate_image/$candimage' id='cand_img' alt='...' class='img-thumbnail'>
+                          </div>
+                        </div>
+                        <div class='col-md-6'>
+                          <div class='form-group'>                        
+                              <label class='form-control-label'>Examination Date</label>
+                              <input class='form-control' type='text' value='$reg_date' id='examination_date' readonly>
+                          </div>
+                        </div>
+                        <div class='col-md-6'>
+                          <div class='form-group'>                     
+                              <label class='form-control-label' for='exampleDatepicker'>Serial Number</label>
+                              <input class='form-control' type='text' id='serial_no' value='$serial_no' readonly>
+                          </div>
+                        </div>
+                      </div>
+                      <div class='row'>
+                        <div class='col-md-6'>
+                          <div class='form-group'>
+                              <label class='form-control-label'>Name</label>  
+                              <input class='form-control' type='text' value='$candidate_name' readonly>
+                          </div>
+                        </div>
+                        <div class='col-md-6'>
+                          <div class='form-group'>
+                              <label class='form-control-label'>Father Name / Husband Name</label>  
+                              <input class='form-control' type='text' value='$son_of' readonly>
+                          </div>
+                        </div>
+                        </div>
+                      <div class='row'>
+                        <div class='col-md-6'>
+                          <div class='form-group'>
+                              <label class='form-control-label' for='exampleDatepicker'>PP No</label>  
+                              <input class='form-control' type='text' value='$passport_no' readonly>
+                          </div>
+                        </div>
+                         <div class='col-md-6'>
+                          <div class='form-group'>
+                              <label class='form-control-label'>CNIC</label>  
+                              <input class='form-control' type='text' value='$cnic' readonly>
+                          </div>
+                        </div>
+                      </div>
+                     
+                      <div class='row'>
+                       <div class='col-md-6'>
+                              <div class='form-group'>
+                                  <label class='form-control-label' for='exampleDatepicker'>Country</label>
+                                  <input class='form-control' type='text' value='$country' readonly>                            
+                            </div>
+                          </div>
+                          <div class='col-md-6'>
+                              <div class='form-group'>
+                                  
+
+                                  <input class='form-control' type='text' value='$token_no' name='cand_token' id='cand_token' readonly>
+
+                            </div>
+                          </div>
+                      </div>";
+                      ?>
+
+
+                        <script type="text/javascript">
+
+                          document.getElementById('barcodeSuccess').style.display = "block";
+                          document.getElementById('barcode').value='<?php echo $sticker_value_2 ?>';
+                          document.getElementById('reg_id').value='<?php echo $regid ?>';
+                         
+                        </script>
+
+                      <?php
+
+
+
+              }
+            }
+                      
+        }
   }  
 
-  // if($_POST['form_name'] == 'Candidate Info Lab Result')
-  // {
-  //      $barcode = $_POST['barcode_num'];
-  //      $serial = $_POST['serial_num'];
-  //      $search_from = $_POST['search_from'];
-  //      $date_value = date('Y-m-d', strtotime($_POST['date_value']));
-  //      $process_ID = $_POST['process_ID'];
-  //      // echo "<script>alert($search_from)</script>";
 
-  //      if($date_value && $search_from==19) {
-
-  //       // echo "<script>alert('hi')</script>";
-              
-  //         $get_cand_data = $data->query("select r.token_no,r.reg_id,r.reg_date,r.passport_no,r.candidate_name,r.son_of,
-  //                   r.country,r.barcode_no,r.serial_no,r.cnic,r.candidate_img,r.pregnancy_test,s.sticker_value_2 from tb_registration r LEFT JOIN tb_lab_sticker s ON s.reg_id = r.reg_id where r.barcode_no='$barcode' || r.serial_no = '$serial' and r.reg_date = '$date_value' and r.country != 'case-cancelled' ORDER by s.sticker_id DESC LIMIT 1");
-
-  //      } else {
-
-  //       // echo "<script>alert('hi 2')</script>";
-
-  //         $get_cand_data = $data->query("select token_no,reg_id,reg_date,passport_no,candidate_name,son_of,country,barcode_no,serial_no,cnic,candidate_img,pregnancy_test from tb_registration where barcode_no='$barcode' || serial_no = '$serial' and country != 'case-cancelled'");
-
-  //      }
-
-      
-  //     $count_result = mysqli_num_rows($get_cand_data);
-  //     if($count_result  == 0)
-  //     {
-  //       echo show_message(0,"No record found.");
-
-  //     }
-  //     else{
-
-  //     while ($row_data = mysqli_fetch_array($get_cand_data)) {
-  //       $regid = $row_data['reg_id'];
-  //       $passport_no = $row_data['passport_no'];
-  //       $candidate_name = $row_data['candidate_name'];
-  //       $son_of = $row_data['son_of'];
-  //       $country = $row_data['country'];
-  //       $serial_no = $row_data['serial_no'];
-  //       $barcode = $row_data['barcode_no'];
-  //       $cnic = $row_data['cnic'];
-  //       $pregnancy_test = $row_data['pregnancy_test'];
-  //       $reg_date = $row_data['reg_date'];
-  //       $candimage = $row_data['candidate_img'];
-  //       $sticker_value_2 = $row_data['sticker_value_2'];
-  //       $token_no = $row_data['token_no'];
-
-  //       if($pregnancy_test == '1'){
-  //         alert_box("Follow the SOP for Pregnant Female");
-  //       }          
-                  
-  //     }
-
-  //     echo"<div class='row'>
-  //                 <div class='col-md-6'>
-  //                     <div class='form-group'>
-  //                       <img src='assets/candidate_image/$candimage' id='cand_img' alt='...' class='img-thumbnail'>
-  //                     </div>
-  //                   </div>
-  //                   </div>
-  //                   <div class='row'>
-  //                   <div class='col-md-6'>
-  //                     <div class='form-group'>                        
-  //                         <label class='form-control-label'>Examination Date</label>
-  //                         <input class='form-control' type='text' value='$reg_date' id='examination_date' readonly>
-  //                     </div>
-  //                   </div>
-  //                   <div class='col-md-6'>
-  //                     <div class='form-group'>                     
-  //                         <label class='form-control-label' for='exampleDatepicker'>Serial Number</label>
-  //                         <input class='form-control' type='text' id='serial_no' value='$serial_no' readonly>
-  //                     </div>
-  //                   </div>
-  //                 </div>
-  //                 <div class='row'>
-  //                   <div class='col-md-6'>
-  //                     <div class='form-group'>
-  //                         <label class='form-control-label'>Name</label>  
-  //                         <input class='form-control' type='text' value='$candidate_name' readonly>
-  //                     </div>
-  //                   </div>
-  //                   <div class='col-md-6'>
-  //                     <div class='form-group'>
-  //                         <label class='form-control-label'>Father Name</label>  
-  //                         <input class='form-control' type='text' value='$son_of' readonly>
-  //                     </div>
-  //                   </div>
-  //                   </div>
-  //                 <div class='row'>
-  //                   <div class='col-md-6'>
-  //                     <div class='form-group'>
-  //                         <label class='form-control-label' for='exampleDatepicker'>PP No</label>  
-  //                         <input class='form-control' type='text' value='$passport_no' readonly>
-  //                     </div>
-  //                   </div>
-  //                    <div class='col-md-6'>
-  //                     <div class='form-group'>
-  //                         <label class='form-control-label'>CNIC</label>  
-  //                         <input class='form-control' type='text' value='$cnic' readonly>
-  //                     </div>
-  //                   </div>
-  //                 </div>
-                 
-  //                 <div class='row'>
-  //                  <div class='col-md-6'>
-  //                         <div class='form-group'>
-  //                             <label class='form-control-label' for='exampleDatepicker'>Country</label>
-  //                             <input class='form-control' type='text' value='$country' readonly>                            
-  //                       </div>
-  //                     </div>
-  //                     <div class='col-md-6'>
-  //                         <div class='form-group'>
-                              
-  //                             <input class='form-control' type='hidden' value='$regid' name='reg_id' id='reg_id' readonly>
-  //                       </div>
-  //                     </div>
-  //                 </div>";
-                   /*?>
-
-                   <script type="text/javascript">
-                    document.getElementById('barcode').value='<?php echo $sticker_value_2 ?>';
-                   </script>
-
-                   <?php */ 
-                  
-  //     }
-  // }
 
 
   if($_POST['form_name'] == 'Candidate Info Lab Result')
   {
-       $barcode = $_POST['barcode_num'];
-       $serial = $_POST['serial_num'];
-       $search_from = $_POST['search_from'];
-       $date_value = date('Y-m-d', strtotime($_POST['date_value']));
-       // $button_name = $_POST['btn'];
-       $process_ID = $_POST['process_ID'];
-       // echo "<script>alert($search_from)</script>";
+         $barcode = $_POST['barcode_num'];
+         $serial = $_POST['serial_num'];
+         $search_from = $_POST['search_from'];
+         $date_value = date('Y-m-d', strtotime($_POST['date_value']));
+         // $button_name = $_POST['btn'];
+         $process_ID = $_POST['process_ID'];
+         // echo "<script>alert($search_from)</script>";
 
-       if($date_value && $search_from==19) {
+         if($date_value && $search_from==19) {
 
-        // echo "<script>alert('hi')</script>";
-              
-          $get_cand_data = $data->query("select r.token_no,r.reg_id,r.reg_date,r.passport_no,r.candidate_name,r.son_of,r.country,r.serial_no,r.cnic,r.candidate_img,r.pregnancy_test,s.sticker_value_2, l.barcode
-          from tb_registration r
-          LEFT JOIN tb_lab_sticker s ON s.reg_id = r.reg_id
-          LEFT JOIN tb_lab_result l ON (r.reg_id = l.reg_id || l.barcode = s.sticker_value_2)
-          where r.serial_no='$serial' and r.reg_date='$date_value' and r.country != 'case-cancelled'");
+          // echo "<script>alert('hi')</script>";
+                
+            $get_cand_data = $data->query("select r.token_no,r.reg_id,r.reg_date,r.passport_no,r.candidate_name,r.son_of,r.country,r.serial_no,r.cnic,r.candidate_img,r.pregnancy_test,s.sticker_value_2, l.barcode
+            from tb_registration r
+            LEFT JOIN tb_lab_sticker s ON s.reg_id = r.reg_id
+            LEFT JOIN tb_lab_result l ON (r.reg_id = l.reg_id || l.barcode = s.sticker_value_2)
+            where r.serial_no='$serial' and r.reg_date='$date_value' and r.country != 'case-cancelled' AND s.sticker_value_2!=''");
 
-       } else {
+         } else {
 
-        // echo "<script>alert('hi 2')</script>";
+          // echo "<script>alert('hi 2')</script>";
 
-          // $get_cand_data = $data->query("select token_no,reg_id,reg_date,passport_no,candidate_name,son_of,country,barcode_no,serial_no,cnic,candidate_img,pregnancy_test from tb_registration where barcode_no='$barcode' || serial_no = '$serial' and country != 'case-cancelled'");
+            // $get_cand_data = $data->query("select token_no,reg_id,reg_date,passport_no,candidate_name,son_of,country,barcode_no,serial_no,cnic,candidate_img,pregnancy_test from tb_registration where barcode_no='$barcode' || serial_no = '$serial' and country != 'case-cancelled'");
 
-       }
+         }
 
-      
-      $count_result = mysqli_num_rows($get_cand_data);
-      if($count_result  == 0)
-      {
-        echo show_message(0,"No record found.");
+        
+          $count_result = mysqli_num_rows($get_cand_data);
+          if($count_result  == 0)
+          {
+            echo show_message(0,"No record found.");
 
-      }
-      else{
+          }
+          else
+          {
 
-      while ($row_data = mysqli_fetch_array($get_cand_data)) {
-        $regid = $row_data['reg_id'];
-        $passport_no = $row_data['passport_no'];
-        $candidate_name = $row_data['candidate_name'];
-        $son_of = $row_data['son_of'];
-        $country = $row_data['country'];
-        $serial_no = $row_data['serial_no'];
-        // $barcode = $row_data['barcode_no'];
-        $cnic = $row_data['cnic'];
-        $pregnancy_test = $row_data['pregnancy_test'];
-        $reg_date = $row_data['reg_date'];
-        $candimage = $row_data['candidate_img'];
-        $sticker_value_2 = $row_data['sticker_value_2'];
-        $token_no = $row_data['token_no'];
-        $l_barcode = $row_data['barcode'];
+            while ($row_data = mysqli_fetch_array($get_cand_data)) {
+              $regid = $row_data['reg_id'];
+              $passport_no = $row_data['passport_no'];
+              $candidate_name = $row_data['candidate_name'];
+              $son_of = $row_data['son_of'];
+              $country = $row_data['country'];
+              $serial_no = $row_data['serial_no'];
+              // $barcode = $row_data['barcode_no'];
+              $cnic = $row_data['cnic'];
+              $pregnancy_test = $row_data['pregnancy_test'];
+              $reg_date = $row_data['reg_date'];
+              $candimage = $row_data['candidate_img'];
+              $sticker_value_2 = $row_data['sticker_value_2'];
+              $token_no = $row_data['token_no'];
+              $l_barcode = $row_data['barcode'];
 
-        if($pregnancy_test == '1'){
-          alert_box("Follow the SOP for Pregnant Female");
-        }          
-                  
-      }
+              if($pregnancy_test == '1'){
+                alert_box("Follow the SOP for Pregnant Female");
+              }          
+                      
+            }
 
-      echo"<div class='row'>
-                  <div class='col-md-6'>
-                      <div class='form-group'>
-                        <img src='assets/candidate_image/$candimage' id='cand_img' alt='...' class='img-thumbnail'>
-                      </div>
-                    </div>
-                    </div>
-                    <div class='row'>
+            echo"<div class='row'>
                     <div class='col-md-6'>
-                      <div class='form-group'>                        
-                          <label class='form-control-label'>Examination Date</label>
-                          <input class='form-control' type='text' value='$reg_date' id='examination_date' readonly>
+                        <div class='form-group'>
+                          <img src='assets/candidate_image/$candimage' id='cand_img2' alt='...' class='img-thumbnail'>
+                        </div>
                       </div>
-                    </div>
-                    <div class='col-md-6'>
-                      <div class='form-group'>                     
-                          <label class='form-control-label' for='exampleDatepicker'>Serial Number</label>
-                          <input class='form-control' type='text' id='serial_no' value='$serial_no' readonly>
                       </div>
-                    </div>
-                  </div>
-                  <div class='row'>
-                    <div class='col-md-6'>
-                      <div class='form-group'>
-                          <label class='form-control-label'>Name</label>  
-                          <input class='form-control' type='text' value='$candidate_name' readonly>
-                      </div>
-                    </div>
-                    <div class='col-md-6'>
-                      <div class='form-group'>
-                          <label class='form-control-label'>Father Name</label>  
-                          <input class='form-control' type='text' value='$son_of' readonly>
-                      </div>
-                    </div>
-                    </div>
-                  <div class='row'>
-                    <div class='col-md-6'>
-                      <div class='form-group'>
-                          <label class='form-control-label' for='exampleDatepicker'>PP No</label>  
-                          <input class='form-control' type='text' value='$passport_no' readonly>
-                      </div>
-                    </div>
-                     <div class='col-md-6'>
-                      <div class='form-group'>
-                          <label class='form-control-label'>CNIC</label>  
-                          <input class='form-control' type='text' value='$cnic' readonly>
-                      </div>
-                    </div>
-                  </div>
-                 
-                  <div class='row'>
-                   <div class='col-md-6'>
-                          <div class='form-group'>
-                              <label class='form-control-label' for='exampleDatepicker'>Country</label>
-                              <input class='form-control' type='text' value='$country' readonly>                            
+                      <div class='row'>
+                      <div class='col-md-6'>
+                        <div class='form-group'>                        
+                            <label class='form-control-label'>Examination Date</label>
+                            <input class='form-control' type='text' value='$reg_date' id='examination_date' readonly>
                         </div>
                       </div>
                       <div class='col-md-6'>
-                          <div class='form-group'>
-                              
-                            <input class='form-control' type='hidden' name='reg_id' value='$regid' readonly>                            
+                        <div class='form-group'>                     
+                            <label class='form-control-label' for='exampleDatepicker'>Serial Number</label>
+                            <input class='form-control' type='text' id='serial_no' value='$serial_no' readonly>
                         </div>
                       </div>
-                  </div>";
+                    </div>
+                    <div class='row'>
+                      <div class='col-md-6'>
+                        <div class='form-group'>
+                            <label class='form-control-label'>Name</label>  
+                            <input class='form-control' type='text' value='$candidate_name' readonly>
+                        </div>
+                      </div>
+                      <div class='col-md-6'>
+                        <div class='form-group'>
+                            <label class='form-control-label'>Father Name</label>  
+                            <input class='form-control' type='text' value='$son_of' readonly>
+                        </div>
+                      </div>
+                      </div>
+                    <div class='row'>
+                      <div class='col-md-6'>
+                        <div class='form-group'>
+                            <label class='form-control-label' for='exampleDatepicker'>PP No</label>  
+                            <input class='form-control' type='text' value='$passport_no' readonly>
+                        </div>
+                      </div>
+                       <div class='col-md-6'>
+                        <div class='form-group'>
+                            <label class='form-control-label'>CNIC</label>  
+                            <input class='form-control' type='text' value='$cnic' readonly>
+                        </div>
+                      </div>
+                    </div>
+                   
+                    <div class='row'>
+                     <div class='col-md-6'>
+                            <div class='form-group'>
+                                <label class='form-control-label' for='exampleDatepicker'>Country</label>
+                                <input class='form-control' type='text' value='$country' readonly>                            
+                          </div>
+                        </div>
+                        <div class='col-md-6'>
+                            <div class='form-group'>
+                                
+                              <input class='form-control' type='hidden' name='reg_id' value='$regid' readonly>                            
+                          </div>
+                        </div>
+                    </div>";
 
-                  if($l_barcode != null){
+                    if($l_barcode != null){
 
-                    if($sticker_value_2 == $l_barcode){
-                      ?>
+                      if($sticker_value_2 == $l_barcode){
+                        ?>
 
+                      <script type="text/javascript">
+                        document.getElementById('alreadyexistError').style.display = "block";
+                        document.getElementById('lab_result_form').disabled = true;
+                      </script>
+
+                        <?php
+                      }
+                    }
+
+                    
+                    ?>  
+                      
                     <script type="text/javascript">
-                      document.getElementById('alreadyexistError').style.display = "block";
+                      document.getElementById('barcode').value='<?php echo $sticker_value_2 ?>';
+                      document.getElementById('reg_id').value='<?php echo $regid ?>'; 
+                      document.getElementById('barcodeSuccess').style.display = "block";
+
                     </script>
 
-                      <?php
-                    }
-                  }
-
-                  
-                  ?>  
-                    
-                  <script type="text/javascript">
-                    document.getElementById('barcode').value='<?php echo $sticker_value_2 ?>';
-                    document.getElementById('reg_id').value='<?php echo $regid ?>';
-
-                  </script>
-
-                  <?php  
-                  
-      }
+                    <?php              
+          }
   }
 
 
@@ -817,7 +1091,7 @@ if(isset($_POST['form_name']))
     $button_name = $_POST['btn'];
     $cand_code = $_POST['candidatecode'];
 
-    $get_reg_user = $data->query("select reg_id,reg_date,passport_no,candidate_name,son_of,country,barcode_no,serial_no,cnic,candidate_img,pregnancy_test,token_no from tb_registration where token_no='$cand_code' || passport_no='$cand_code' and country != 'case-cancelled'");
+    $get_reg_user = $data->query("select reg_id,reg_date,passport_no,candidate_name,son_of,country,barcode_no,serial_no,cnic,candidate_img,pregnancy_test,token_no from tb_registration where token_no='$cand_code' || passport_no='$cand_code' and country != 'case cancelled'");
     while ($row_data = mysqli_fetch_array($get_reg_user)) {
         $regid = $row_data['reg_id'];
         $passport_no = $row_data['passport_no'];
@@ -1370,8 +1644,9 @@ if(isset($_POST['form_name']))
     $slip_issue_date = date('Y-m-d',strtotime($form_values['28']));
     $dob = date('Y-m-d', strtotime($form_values['16']));
     $token_num = $form_values['22'];
+    $myDateTime = DateTime::createFromFormat('d/m/Y', $form_values['11']);
+    $registrationdate = $myDateTime->format('Y-m-d');
 
-    $registrationdate = date('Y-m-d', strtotime($form_values['11']));
     $reg_insert = array(
                 'passport_no' => mysqli_real_escape_string($data->con, $form_values['13']),
                 'passport_issue_date' => mysqli_real_escape_string($data->con, $ppissuedate),
@@ -1438,6 +1713,7 @@ if(isset($_POST['form_name']))
       <script type="text/javascript">
            
             document.getElementById("printslip").disabled = false;
+            document.getElementById("registration").disabled = true;
       </script>
 
     <?php
@@ -1490,12 +1766,20 @@ if(isset($_POST['form_name']))
 
     define('UPLOAD_DIR', '../assets/candidate_image/'); 
     $img = $_POST['imgBase64']; 
+
     $img = str_replace('data:image/png;base64,', '', $img); 
     $img = str_replace(' ', '+', $img); 
     $data = base64_decode($img); 
     $uniqid = uniqid();
-    $file = UPLOAD_DIR . $uniqid . '.png'; 
-    $file_name = $uniqid.'.png';
+    if(isset($_POST['passport'])) {
+      $passport = $_POST['passport']; 
+      $file = UPLOAD_DIR . $passport . '.png'; 
+      $file_name = $passport.'.png';
+    } else {
+      $file = UPLOAD_DIR . $uniqid . '.png';
+      $file_name = $uniqid.'.png';
+    }
+    
     $success = file_put_contents($file, $data); 
     //print $success ? $file : 'Unable to save the file.'; 
     if($success){
@@ -1583,12 +1867,20 @@ if(isset($_POST['form_name']))
 
     define('UPLOAD_DIR', '../assets/candidate_image/'); 
     $img = $_POST['imgBase64']; 
+
     $img = str_replace('data:image/png;base64,', '', $img); 
     $img = str_replace(' ', '+', $img); 
     $data = base64_decode($img); 
     $uniqid = uniqid();
-    $file = UPLOAD_DIR . $uniqid . '.png'; 
-    $file_name = $uniqid.'.png';
+    if(isset($_POST['passport'])) {
+      $passport = $_POST['passport']; 
+      $file = UPLOAD_DIR . $passport . '.png'; 
+      $file_name = $passport.'.png';
+    } else {
+      $file = UPLOAD_DIR . $uniqid . '.png';
+      $file_name = $uniqid.'.png';
+    }
+    
     $success = file_put_contents($file, $data); 
     //print $success ? $file : 'Unable to save the file.'; 
     if($success){
@@ -1724,68 +2016,180 @@ if(isset($_POST['form_name']))
 
     $form_values = $_POST['form_values'];
     $serial_no = $form_values['1'];
-    $reg_date = $form_values['2'];
+    $reg_date = $form_values['2'];    
     $regID = $form_values['0'];
-    $allowed_stickers = 4;
-    // $sticker_barcode_value = $reg_date.$serial_no;
-    $sticker_barcode_value = $reg_date.'.'.$regID;
-    $barcode_label = date("d-m-Y",strtotime($reg_date));
+    $process_id = $form_values['3'];
+    // $allowed_stickers = 4;
+    $printed="";
 
-      $sticker_insert = array(
-                'reg_id' => mysqli_real_escape_string($data->con, $regID),
-                'serial_no' => mysqli_real_escape_string($data->con, $serial_no),
-                'reg_date' => mysqli_real_escape_string($data->con, $reg_date),
-                'sticker_print_by' => mysqli_real_escape_string($data->con, $loginuser),
-                'sticker_value_1' => mysqli_real_escape_string($data->con, $sticker_barcode_value),
-                'center_id' => mysqli_real_escape_string($data->con, $center_id)
+    $check_record = $data->query("SELECT * FROM `tb_lab_sticker` WHERE `serial_no` LIKE '$serial_no' AND `reg_date` = '$reg_date' ORDER BY `sticker_id` DESC");
+
+    $count_rows = mysqli_num_rows($check_record);
+    
+    if($count_rows > 0) {
+
+      while($rows =mysqli_fetch_array($check_record)) {
+
+        $sticker_value_1 = $rows['sticker_value_1'];
+        $printed = $rows['sticker_1_printed'];
+      }
+
+      $place = $data->query("select no_sticker_prints from user_action_rights where user_id='$loginuser' and module_id='$process_id'");
+        while ($rows=mysqli_fetch_array($place)) {
+          $no_sticker_prints = $rows['no_sticker_prints'];
+          if($no_sticker_prints!='0')
+            $allowed_stickers = $no_sticker_prints;
+        }
+        // alert_box($allowed_stickers);
+        // $sticker_barcode_value = $reg_date.$serial_no;
+        $sticker_barcode_value = $reg_date.'.'.$regID;
+        $barcode_label = date("d-m-Y",strtotime($reg_date));
+
+          
+      alert_box('printed: '.$printed);
+
+      $attempts_allowed = $data->query("select sample_sticker_attempts from user_action_rights where user_id='$loginuser' and module_id='$process_id'");
+
+      while($rows = mysqli_fetch_array($attempts_allowed)) {
+        $sample_sticker_attempts = $rows['sample_sticker_attempts'];
+      }
+
+      if($printed < $sample_sticker_attempts) {
+
+          for ($p=1; $p <= $allowed_stickers ; $p++) {
+          //start print sticker
+            ?>
+                <script language = 'javascript'>
+                var TSCObj
+                TSCObj = new ActiveXObject("TSCActiveX.TSCLIB")
+                TSCObj.ActiveXopenport("TSC TTP-244 Pro") //TSC TTP-244 Pro
+                // TSCObj.ActiveXformfeed()
+                TSCObj.ActiveXnobackfeed()
+                TSCObj.ActiveXsendcommand("SIZE 80 mm, 50 mm")
+                TSCObj.ActiveXsendcommand("SPEED 4")
+                TSCObj.ActiveXsendcommand("DENSITY 12")
+                TSCObj.ActiveXsendcommand("DIRECTION 1")
+                TSCObj.ActiveXsendcommand("SET TEAR ON")
+
+                TSCObj.ActiveXclearbuffer()
+                //TSCObj.ActiveXbarcode("100", "40", "128", "50", "1", "0", "2", "2", "123456789")
+                TSCObj.ActiveXbarcode("150", "80", "128", "150", "0", "0", "2", "2", "<?php echo $sticker_barcode_value; ?>")
+                TSCObj.ActiveXprinterfont("180", "240","1","0","2","2","<?php echo $barcode_label; ?>")
+                TSCObj.ActiveXprintlabel("1","1")
+                TSCObj.ActiveXcloseport()
+              </script>
+
+               
+            <?php
+          }
+          //end print sticker
                 
-            );
+            $printed++;
+            // update sticker_1_printed column
+            $upd_sticker1 = $data->query("update tb_lab_sticker set sticker_1_printed ='$printed',sticker_print_by='$loginuser'  WHERE `serial_no` LIKE '$serial_no' AND `reg_date` = '$reg_date'");  
 
-    for ($j=1; $j <= $allowed_stickers; $j++) {
+            if($upd_sticker1 == 1) {
+              echo "<img alt='barcode' src='./barcode/barcode.php?codetype=Code39&size=40&text=".$reg_date."&print=true'>";
+              echo "<br>";
+              echo show_message(1,"Sticker Sent for Print"); 
+            }          
+    
+      }
+      else {
+        echo show_message(0,"Contact Administrator for more prints.");
+      }
+    }
+    elseif($count_rows == 0) {
+
+      while($rows =mysqli_fetch_array($check_record)) {
+
+        $sticker_value_1 = $rows['sticker_value_1'];
+        $printed = $rows['sticker_1_printed'];
+      }
+
+      $place = $data->query("select no_sticker_prints from user_action_rights where user_id='$loginuser' and module_id='$process_id'");
+        while ($rows=mysqli_fetch_array($place)) {
+          $no_sticker_prints = $rows['no_sticker_prints'];
+          if($no_sticker_prints!='0')
+            $allowed_stickers = $no_sticker_prints;
+        }
+        // alert_box($allowed_stickers);
+        // $sticker_barcode_value = $reg_date.$serial_no;
+        $sticker_barcode_value = $reg_date.'.'.$regID;
+        $barcode_label = date("d-m-Y",strtotime($reg_date));
+
+          $sticker_insert = array(
+                    'reg_id' => mysqli_real_escape_string($data->con, $regID),
+                    'serial_no' => mysqli_real_escape_string($data->con, $serial_no),
+                    'reg_date' => mysqli_real_escape_string($data->con, $reg_date),
+                    'sticker_print_by' => mysqli_real_escape_string($data->con, $loginuser),
+                    'sticker_1_printed' => mysqli_real_escape_string($data->con, '1'),
+                    'sticker_value_1' => mysqli_real_escape_string($data->con, $sticker_barcode_value),
+                    'center_id' => mysqli_real_escape_string($data->con, $center_id)
+                    
+                );
+      alert_box('printed: '.$printed);
+
+      $attempts_allowed = $data->query("select sample_sticker_attempts from user_action_rights where user_id='$loginuser' and module_id='$process_id'");
+
+      while($rows = mysqli_fetch_array($attempts_allowed)) {
+        $sample_sticker_attempts = $rows['sample_sticker_attempts'];
+      }
+
+      if($printed < $sample_sticker_attempts) {
 
         $query_result = $data->insert('tb_lab_sticker', $sticker_insert);
-    }
 
-    if($query_result){
+        if($query_result) {
 
-      for ($p=1; $p <= $allowed_stickers ; $p++) {
-        //print sticker
-      }
-        ?>
-            <script language = 'javascript'>
-            var TSCObj
-            TSCObj = new ActiveXObject("TSCActiveX.TSCLIB")
-            TSCObj.ActiveXopenport("TSC TTP-244 Pro") //TSC TTP-244 Pro
-            // TSCObj.ActiveXformfeed()
-            TSCObj.ActiveXnobackfeed()
-            TSCObj.ActiveXsendcommand("SIZE 80 mm, 50 mm")
-            TSCObj.ActiveXsendcommand("SPEED 4")
-            TSCObj.ActiveXsendcommand("DENSITY 12")
-            TSCObj.ActiveXsendcommand("DIRECTION 1")
-            TSCObj.ActiveXsendcommand("SET TEAR ON")
+          for ($p=1; $p <= $allowed_stickers ; $p++) {
+          //start print sticker
+            ?>
+                <script language = 'javascript'>
+                var TSCObj
+                TSCObj = new ActiveXObject("TSCActiveX.TSCLIB")
+                TSCObj.ActiveXopenport("TSC TTP-244 Pro") //TSC TTP-244 Pro
+                // TSCObj.ActiveXformfeed()
+                TSCObj.ActiveXnobackfeed()
+                TSCObj.ActiveXsendcommand("SIZE 80 mm, 50 mm")
+                TSCObj.ActiveXsendcommand("SPEED 4")
+                TSCObj.ActiveXsendcommand("DENSITY 12")
+                TSCObj.ActiveXsendcommand("DIRECTION 1")
+                TSCObj.ActiveXsendcommand("SET TEAR ON")
 
-            TSCObj.ActiveXclearbuffer()
-            //TSCObj.ActiveXbarcode("100", "40", "128", "50", "1", "0", "2", "2", "123456789")
-            TSCObj.ActiveXbarcode("150", "80", "128", "150", "0", "0", "2", "2", "<?php echo $sticker_barcode_value; ?>")
-            TSCObj.ActiveXprinterfont("180", "240","1","0","2","2","<?php echo $barcode_label; ?>")
-            TSCObj.ActiveXprintlabel("3","1")
-            TSCObj.ActiveXcloseport()
-          </script>
+                TSCObj.ActiveXclearbuffer()
+                //TSCObj.ActiveXbarcode("100", "40", "128", "50", "1", "0", "2", "2", "123456789")
+                TSCObj.ActiveXbarcode("150", "80", "128", "150", "0", "0", "2", "2", "<?php echo $sticker_barcode_value; ?>")
+                TSCObj.ActiveXprinterfont("180", "240","1","0","2","2","<?php echo $barcode_label; ?>")
+                TSCObj.ActiveXprintlabel("1","1")
+                TSCObj.ActiveXcloseport()
+              </script>
 
-           
-        <?php
-        //end print sticker
+               
+            <?php
+          }
+          //end print sticker
+                
+            $printed++;
+            // update sticker_1_printed column
+            $upd_sticker2 = $data->query("update tb_lab_sticker set sticker_1_printed ='$printed',sticker_print_by='$loginuser'  WHERE `serial_no` LIKE '$serial_no' AND `reg_date` = '$reg_date'");            
+
+            echo "<img alt='barcode' src='./barcode/barcode.php?codetype=Code39&size=40&text=".$reg_date."&print=true'>";
+            echo "<br>";
+            echo show_message(1,"Sticker Sent for Print");
+
             
-        
+        }else{
 
-        echo "<img alt='barcode' src='./barcode/barcode.php?codetype=Code39&size=40&text=".$reg_date."&print=true'>";
-        echo "<br>";
-        echo show_message(1,"Sticker Sent for Print");
-
-        
-    }else{
-
-        echo show_message(0,"Some error occured. Try Again Later.");
+            echo show_message(0,"Some error occured. Try Again Later.");
+        }
+      }
+      else {
+        echo show_message(0,"Contact Administrator for more prints.");
+      }
+    }
+    else {
+      echo show_message(0,"No record found against this candidate, Try Again.");
     }
 
   }
@@ -1796,6 +2200,9 @@ if(isset($_POST['form_name']))
     $reg_date = $_POST['reg_date'];
     $barcode_sticker1 = $_POST['sticker1'];
     $UserType = $_POST['UserType'];
+    
+    $module_id = 20; // lab sticker print module id
+
     //$random_code = rand(10,100); //getRandom(5); //rand(10,100);
     
     /* -random string code-*/
@@ -1822,19 +2229,23 @@ if(isset($_POST['form_name']))
     }
 
 
-
-
-    $allowed_stickers = 1;
+    $allow = $data->query("select lab_sticker from user_action_rights where user_id='$loginuser' and module_id='$module_id'");
+    while ($rows=mysqli_fetch_array($allow)) {
+      $lab_sticker = $rows['lab_sticker'];
+      if($lab_sticker!='0')
+        $allowed_stickers = $lab_sticker;
+    }
+    // alert_box($allowed_stickers);
     $sticker_barcode_value2 = $random_string.' - '.$reg_date;
 
     $already_print = $data->query("select sticker_value_2 from tb_lab_sticker where sticker_value_1='$barcode_sticker1' and sticker_value_2 is null");
                       $count_sticker = mysqli_num_rows($already_print);
                       if($UserType == 'admin' || $count_sticker > 0){
 
-                        $upd_sticker = $data->query("update tb_lab_sticker set sticker_value_2 ='$sticker_barcode_value2',sticker_read_by='$loginuser' where sticker_value_1='$barcode_sticker1'");
+                        $upd_sticker = $data->query("update tb_lab_sticker set sticker_value_2 ='$sticker_barcode_value2',sticker_read_by='$loginuser',printed='1' where sticker_value_1='$barcode_sticker1'");
 
                           if($upd_sticker ==1){
-
+                            // alert_box($allowed_stickers);
                             for ($p=1; $p <= $allowed_stickers ; $p++) {
 
                             ?>
@@ -1868,44 +2279,72 @@ if(isset($_POST['form_name']))
                           
       }
 
-elseif ($count_sticker == 0) {
+    elseif ($count_sticker == 0) {
 
-  $already_print2 = $data->query("select sticker_value_2 from tb_lab_sticker where sticker_value_1='$barcode_sticker1'");
-  while($rows =mysqli_fetch_array($already_print2)){
 
-      $sticker_barcode_value23 = $rows['sticker_value_2'];
-  }
-  
-    for ($p=1; $p <= $allowed_stickers ; $p++) {
+      $already_print2 = $data->query("select sticker_value_2,printed from tb_lab_sticker where sticker_value_1='$barcode_sticker1'");
+      while($rows =mysqli_fetch_array($already_print2)) {
 
-                            ?>
-                              <script language = 'javascript'>
-                                var TSCObj
-                                TSCObj = new ActiveXObject("TSCActiveX.TSCLIB")
-                                TSCObj.ActiveXopenport("TSC TTP-244 Pro") //TSC TTP-244 Pro
-                                TSCObj.ActiveXnobackfeed()
-                                TSCObj.ActiveXsendcommand("SIZE 70 mm, 50 mm")
-                                TSCObj.ActiveXsendcommand("SPEED 4")
-                                TSCObj.ActiveXsendcommand("DENSITY 12")
-                                TSCObj.ActiveXsendcommand("DIRECTION 1")
-                                TSCObj.ActiveXsendcommand("SET TEAR ON")
-                                TSCObj.ActiveXclearbuffer()
-                                // TSCObj.ActiveXnobackfeed()
-                                //TSCObj.ActiveXbarcode("100", "40", "128", "50", "1", "0", "2", "2", "123456789")
-                                TSCObj.ActiveXbarcode("60", "90", "128", "120", "2", "0", "2", "2", "<?php echo $sticker_barcode_value23; ?>")
-                                TSCObj.ActiveXprintlabel("1","1")
-                                TSCObj.ActiveXcloseport()
-                              </script>
-                             <?php
-                             }
-                              echo "<img alt='barcode' src='./barcode/barcode.php?codetype=Code39&size=40&text=".$sticker_barcode_value23."&print=true'>";
-                              echo "<br>";
-                              echo show_message(1,"Sticker Sent for Print");
+        $sticker_barcode_value23 = $rows['sticker_value_2'];
+        $printed = $rows['printed'];
+      }
+      // alert_box('printed: '.$printed);
 
-}
+      $attempts_allowed = $data->query("select lab_sticker_attempts from user_action_rights where user_id='$loginuser' and module_id='$module_id'");
+
+      while($rows = mysqli_fetch_array($attempts_allowed)) {
+        $lab_sticker_attempts = $rows['lab_sticker_attempts'];
+      }
+
+      // alert_box('attempts: '.$lab_sticker_attempts);
+
+      if($printed < $lab_sticker_attempts) {
+
+        for ($p=1; $p <= $allowed_stickers ; $p++) {
+        // alert_box("hi");
+                              ?>
+                                <script language = 'javascript'>
+                                  var TSCObj
+                                  TSCObj = new ActiveXObject("TSCActiveX.TSCLIB")
+                                  TSCObj.ActiveXopenport("TSC TTP-244 Pro") //TSC TTP-244 Pro
+                                  TSCObj.ActiveXnobackfeed()
+                                  TSCObj.ActiveXsendcommand("SIZE 70 mm, 50 mm")
+                                  TSCObj.ActiveXsendcommand("SPEED 4")
+                                  TSCObj.ActiveXsendcommand("DENSITY 12")
+                                  TSCObj.ActiveXsendcommand("DIRECTION 1")
+                                  TSCObj.ActiveXsendcommand("SET TEAR ON")
+                                  TSCObj.ActiveXclearbuffer()
+                                  // TSCObj.ActiveXnobackfeed()
+                                  //TSCObj.ActiveXbarcode("100", "40", "128", "50", "1", "0", "2", "2", "123456789")
+                                  TSCObj.ActiveXbarcode("60", "90", "128", "120", "2", "0", "2", "2", "<?php echo $sticker_barcode_value23; ?>")
+                                  TSCObj.ActiveXprintlabel("1","1")
+                                  TSCObj.ActiveXcloseport()
+                                </script>
+                               <?php
+                               }
+                                
+                                $printed++;
+                                // update printed column
+                                $upd_sticker2 = $data->query("update tb_lab_sticker set printed ='$printed',sticker_read_by='$loginuser' where sticker_value_1='$barcode_sticker1'");
+
+                                if($upd_sticker2 == 1) {
+                                  echo "<img alt='barcode' src='./barcode/barcode.php?codetype=Code39&size=40&text=".$sticker_barcode_value23."&print=true'>";
+                                  echo "<br>";
+                                  echo show_message(1,"Sticker Sent for Print"); 
+                                }
+        }
+        else {
+            echo show_message(0,"Contact Administrator for more prints.");
+        }
+
+
+
+                              // echo show_message(0,"Contact Administrator for more print.");
+
+    }
 
       else{
-        echo show_message(0,"Contact Administrator for more print.");   
+        echo show_message(0,"Oops, Something went wrong!.");   
       }
 
   }
@@ -1929,7 +2368,7 @@ elseif ($count_sticker == 0) {
 
         echo "<label class='form-control-label' for='item_2'>Select Module</label>";
 
-            echo "<select class='form-control' name='select_module' id='item_3' onchange='get_user_previous_modules($user)'>";
+            echo "<select class='form-control js-example-basic-single' name='select_module' id='item_3' onchange='get_user_previous_modules($user)'>";
         echo "<option value=''>Select</option>";
 
             while ($rows = mysqli_fetch_array($get_modules_query)) {
@@ -1941,142 +2380,14 @@ elseif ($count_sticker == 0) {
                  }
               echo "</select>";
 
-        echo "</div>";
+        echo "</div>
+        <script>$(document).ready(function() {
+          $('.js-example-basic-single').select2();
+        });</script>";
         
       }
   }
-  //   if($_POST['form_name'] == 'User Actions')
-  // {
 
-  //   $user_id = $_POST['user_id'];
-  //   $module_id = $_POST['module_id'];
-
-  //       $check_user=mysqli_query($data->con,"select * from user_action_rights where user_id='$user_id' and module_id='$module_id'");
-
-  //             $count_user=mysqli_num_rows($check_user);
-  //             if($count_user == 0)
-  //             {
-  //                 echo "<label class='form-control-label' for='exampleFormControlSelect2'>Action Rights</label>
-  //                       <div class='custom-control custom-checkbox mb-3'>
-  //                         <input class='custom-control-input' id='edit' type='checkbox' name='edit_check' value='1' unchecked>
-  //                         <label class='custom-control-label' for='edit'>Edit</label>
-  //                       </div>
-  //                       <div class='custom-control custom-checkbox mb-3'>
-  //                         <input class='custom-control-input' id='delete' type='checkbox' name='delete_check' value='1' unchecked>
-  //                         <label class='custom-control-label' for='delete'>Delete</label>
-  //                       </div>
-  //                       <div class='custom-control custom-checkbox mb-3'>
-  //                         <input class='custom-control-input' id='print-labstickers' type='checkbox' name='print_check' value='1' unchecked>
-  //                         <label class='custom-control-label' for='print-labstickers'>Print Lab Stickers</label>
-  //                       </div>
-  //                       <div class='custom-control custom-checkbox mb-3'>
-  //                         <input class='custom-control-input' id='biometric' type='checkbox' name='biometric_check' value='1' unchecked>
-  //                         <label class='custom-control-label' for='biometric'>Biometric Verification</label>
-  //                       </div>
-  //                       <div class='custom-control custom-checkbox mb-3'>
-  //                         <input class='custom-control-input' id='barcode' type='checkbox' name='barcod_check' value='1' unchecked>
-  //                         <label class='custom-control-label' for='barcode'>Barcode Verification</label>
-  //                       </div>
-  //                       <div class='custom-control custom-checkbox mb-3'>
-  //                         <input class='custom-control-input' id='serial_no' type='checkbox' name='serial_no_check' value='1' unchecked>
-  //                         <label class='custom-control-label' for='serial_no'>Serial_no Verification</label>
-  //                       </div>
-  //                       <div class='custom-control custom-checkbox mb-3'>
-  //                         <input class='custom-control-input' id='now_serving' type='checkbox' name='now_serving_check' value='1' unchecked>
-  //                         <label class='custom-control-label' for='now_serving'>Show Now Serving</label>
-  //                       </div>
-
-  //                   </div>";
-
-  //             }
-  //             else {
-
-  //               while ($rows = mysqli_fetch_array($check_user)) {
-                  
-  //                 $edit_rights = $rows['edit_rights'];
-  //                 $delete_rights = $rows['delete_rights'];
-  //                 $barcode_verification = $rows['barcode_verification'];
-  //                 $print_lab_sticker = $rows['print_lab_sticker'];
-  //                 $biometric_allow = $rows['biometric_allow'];
-  //                 $serial_no_rights = $rows['serial_no_rights'];
-  //                 $now_serving_rights = $rows['now_serving_rights'];
-
-  //               }
-
-  //               echo "<label class='form-control-label' for='exampleFormControlSelect2'>Action Rights</label>
-  //                       <div class='custom-control custom-checkbox mb-3'>
-  //                         <input class='custom-control-input' id='edit' type='checkbox' name='edit_check' value='$edit_rights'"; 
-  //                         if($edit_rights==1) {
-  //                           echo "checked>"; 
-  //                           } 
-  //                         else {
-  //                             echo "unchecked>";
-  //                           } 
-  //                 echo "<label class='custom-control-label' for='edit'>Edit</label>
-  //                       </div>
-  //                       <div class='custom-control custom-checkbox mb-3'>
-  //                         <input class='custom-control-input' id='delete' type='checkbox' name='delete_check' value='$delete_rights'"; 
-  //                         if($delete_rights==1) {
-  //                           echo "checked>"; 
-  //                           } 
-  //                         else {
-  //                             echo "unchecked>";
-  //                           } 
-  //                 echo "<label class='custom-control-label' for='delete'>Delete</label>
-  //                       </div>
-  //                       <div class='custom-control custom-checkbox mb-3'>
-  //                         <input class='custom-control-input' id='print-labstickers' type='checkbox' name='print_check' value='$print_lab_sticker'"; 
-  //                         if($print_lab_sticker==1) {
-  //                           echo "checked>"; 
-  //                           } 
-  //                         else {
-  //                             echo "unchecked>";
-  //                           } 
-  //                 echo "<label class='custom-control-label' for='print-labstickers'>Print Lab Stickers</label>
-  //                       </div>
-  //                       <div class='custom-control custom-checkbox mb-3'>
-  //                         <input class='custom-control-input' id='biometric' type='checkbox' name='biometric_check' value='$biometric_allow'"; 
-  //                         if($biometric_allow==1) {
-  //                           echo "checked>"; 
-  //                           } 
-  //                         else {
-  //                             echo "unchecked>";
-  //                           } 
-  //                 echo "<label class='custom-control-label' for='biometric'>Biometric Verification</label>
-  //                       </div>
-  //                       <div class='custom-control custom-checkbox mb-3'>
-  //                         <input class='custom-control-input' id='barcode' type='checkbox' name='barcod_check' value='$barcode_verification'"; 
-  //                         if($barcode_verification==1) {
-  //                           echo "checked>"; 
-  //                           } 
-  //                         else {
-  //                             echo "unchecked>";
-  //                           } 
-  //                 echo "<label class='custom-control-label' for='barcode'>Barcode Verification</label>
-  //                       </div>
-  //                       <div class='custom-control custom-checkbox mb-3'>
-  //                         <input class='custom-control-input' id='serial_no' type='checkbox' name='serial_no_check' value='$serial_no_rights'"; 
-  //                         if($serial_no_rights==1) {
-  //                           echo "checked>"; 
-  //                           } 
-  //                         else {
-  //                             echo "unchecked>";
-  //                           } 
-  //                 echo "<label class='custom-control-label' for='serial_no'>Serial_no Verification</label>
-  //                       </div>
-  //                       <div class='custom-control custom-checkbox mb-3'>
-  //                         <input class='custom-control-input' id='now_serving' type='checkbox' name='now_serving_check' value='$now_serving_rights'"; 
-  //                         if($now_serving_rights==1) {
-  //                           echo "checked=checked>"; 
-  //                           } 
-  //                         else {
-  //                             echo "unchecked>";
-  //                           } 
-  //                 echo "<label class='custom-control-label' for='now_serving'>Show Now Serving</label>";
-              
-  //           }
-      
-  // }
 
   if($_POST['form_name'] == 'User Actions')
   {
@@ -2089,20 +2400,38 @@ elseif ($count_sticker == 0) {
               $count_user=mysqli_num_rows($check_user);
               if($count_user == 0)
               {
-                  echo "<label class='form-control-label' for='exampleFormControlSelect2'>Action Rights</label>
-                        <div class='custom-control custom-checkbox mb-3'>
+                  echo "<label class='form-control-label' for='exampleFormControlSelect2'>Action Rights</label>";
+                  if($module_id != 8 || $module_id != 22 || $module_id != 28 || $module_id != 29 || $module_id != 31
+                        || $module_id != 32 || $module_id != 33 || $module_id != 34 || $module_id != 35 || $module_id != 36
+                        || $module_id != 37 || $module_id != 38 || $module_id != 39 || $module_id != 40 || $module_id != 41) { 
+                        echo "<div class='custom-control custom-checkbox mb-3'>
                           <input class='custom-control-input' id='edit' type='checkbox' name='edit_check' value='1' unchecked>
                           <label class='custom-control-label' for='edit'>Edit</label>
                         </div>
                         <div class='custom-control custom-checkbox mb-3'>
                           <input class='custom-control-input' id='delete' type='checkbox' name='delete_check' value='1' unchecked>
                           <label class='custom-control-label' for='delete'>Delete</label>
-                        </div>
-                        <div class='custom-control custom-checkbox mb-3'>
+                        </div>";
+                      }
+                      if($module_id == 7)
+                      {
+                        echo "<div class='custom-control custom-checkbox mb-3'>
                           <input class='custom-control-input' id='print-labstickers' type='checkbox' name='print_check' value='1' unchecked>
-                          <label class='custom-control-label' for='print-labstickers'>Print Lab Stickers</label>
-                        </div>
-                        <div class='custom-control custom-checkbox mb-3'>
+                          <label class='custom-control-label' for='print-labstickers'>Print Sample Collection Stickers - <span class='badge badge-danger badge-lg'>Sample Collection</span></label>
+                          <div class='row'>
+                            <div class='col-md-6'>
+                              <label class='form-control-label' for='sample_sticker_attempts'>Sample Collection Sticker Attempts
+                              <input class='form-control' name='sample_sticker_attempts' type='number' min='0' max='20' placeholder='number of attempts' id='sample_sticker_attempts'>
+                            </div>
+                            <div class='col-md-6'>
+                              <label class='form-control-label' for='print-labstickers-NumberOfTimes'>Number Of Stickers, Allowed To Print</label>
+                              <input class='form-control' name='no_sticker_prints' type='number' min='0' max='99' placeholder='number of times' id='example-text-input'>
+                            </div>
+                          </div>";
+                        
+                      }
+                      echo "</div>";
+                        echo "<div class='custom-control custom-checkbox mb-3'>
                           <input class='custom-control-input' id='biometric' type='checkbox' name='biometric_check' value='1' unchecked>
                           <label class='custom-control-label' for='biometric'>Biometric Verification</label>
                         </div>
@@ -2130,8 +2459,38 @@ elseif ($count_sticker == 0) {
                           <input class='custom-control-input' id='now_serving' type='checkbox' name='now_serving_check' value='1' unchecked>
                           <label class='custom-control-label' for='now_serving'>Show Now Serving</label>
                         </div>
+                        <div class='row'>
+                          <div class='col-md-6'>
+                            <label class='form-control-label' for='counter_number'>Counter No. - <span class='badge badge-warning badge-lg'>Registration</span></label>
+                            <input class='form-control' name='counter_no' type='number' min='0' max='6' placeholder='counter number' id='counter_number'>
+                          </div>
+                        </div>";
+                      if($module_id == 20)
+                      {
+                        echo "<div class='row'>
+                          <div class='col-md-6'>
+                            <label class='form-control-label' for='lab_sticker_attempts'>Attempts for Print Lab Sticker. - <span class='badge badge-primary badge-lg'>LAB</span></label>
+                            <input class='form-control' name='lab_sticker_attempts' type='number' min='0' max='20' placeholder='number of attempts' id='lab_sticker_attempts'>
+                          </div>
+                          <div class='col-md-6'>
+                            <label class='form-control-label' for='lab_sticker'>Print Lab Sticker. - <span class='badge badge-primary badge-lg'>LAB</span></label>
+                            <input class='form-control' name='lab_sticker' type='number' min='0' max='6' placeholder='number of prints' id='lab_sticker'>
+                          </div>
+                        </div>";
+                      }
+                        echo "<div class='row'>
+                          
+                        </div>
+                        <div class='row'>
+                          <div class='col-md-6'>
+                            <label class='form-control-label' for='duplicate_sticker'>Duplicate Lab Sticker. - <span class='badge badge-primary badge-lg'>Administration </span></label>
+                            <input class='form-control' name='duplicate_sticker' type='number' min='0' max='6' placeholder='number of prints' id='duplicate_sticker'>
+                          </div>
+                        </div>
 
                     </div>";
+                    // <input class='custom-control-input' id='print-labstickers-NumberOfTimes' type='input' name='print_NumberOfTimes'>
+                          // <label class='custom-control-label' for='print-labstickers-NumberOfTimes'>Number of Times</label>
 
               }
               else {
@@ -2142,17 +2501,26 @@ elseif ($count_sticker == 0) {
                   $delete_rights = $rows['delete_rights'];
                   $barcode_verification = $rows['barcode_verification'];
                   $print_lab_sticker = $rows['print_lab_sticker'];
+                  $sample_sticker_attempts = $rows['sample_sticker_attempts'];
+                  $no_sticker_prints = $rows['no_sticker_prints'];
                   $biometric_allow = $rows['biometric_allow'];
                   $serial_no_rights = $rows['serial_no_rights'];
                   $now_serving_rights = $rows['now_serving_rights'];
                   $b_plus_rights = $rows['b_plus_rights'];
                   $pending_rights = $rows['pending_rights'];
                   $search_with_date = $rows['date_search_rights'];
+                  $lab_sticker_attempts = $rows['lab_sticker_attempts'];
+                  $lab_sticker = $rows['lab_sticker'];
+                  $duplicate_sticker = $rows['duplicate_sticker'];
+                  $counter_no = $rows['counter_no'];
 
                 }
 
-                echo "<label class='form-control-label' for='exampleFormControlSelect2'>Action Rights</label>
-                        <div class='custom-control custom-checkbox mb-3'>
+                echo "<label class='form-control-label' for='exampleFormControlSelect2'>Action Rights</label>";
+                    if($module_id != 8 || $module_id != 22 || $module_id != 28 || $module_id != 29 || $module_id != 31
+                        || $module_id != 32 || $module_id != 33 || $module_id != 34 || $module_id != 35 || $module_id != 36
+                        || $module_id != 37 || $module_id != 38 || $module_id != 39 || $module_id != 40 || $module_id != 41) {  
+                        echo "<div class='custom-control custom-checkbox mb-3'>
                           <input class='custom-control-input' id='edit' type='checkbox' name='edit_check' value='$edit_rights'"; 
                           if($edit_rights==1) {
                             echo "checked>"; 
@@ -2160,19 +2528,21 @@ elseif ($count_sticker == 0) {
                           else {
                               echo "unchecked>";
                             } 
-                  echo "<label class='custom-control-label' for='edit'>Edit</label>
-                        </div>
-                        <div class='custom-control custom-checkbox mb-3'>
-                          <input class='custom-control-input' id='delete' type='checkbox' name='delete_check' value='$delete_rights'"; 
-                          if($delete_rights==1) {
-                            echo "checked>"; 
-                            } 
-                          else {
-                              echo "unchecked>";
-                            } 
-                  echo "<label class='custom-control-label' for='delete'>Delete</label>
-                        </div>
-                        <div class='custom-control custom-checkbox mb-3'>
+                        echo "<label class='custom-control-label' for='edit'>Edit</label>
+                              </div>
+                              <div class='custom-control custom-checkbox mb-3'>
+                                <input class='custom-control-input' id='delete' type='checkbox' name='delete_check' value='$delete_rights'"; 
+                                if($delete_rights==1) {
+                                  echo "checked>"; 
+                                  } 
+                                else {
+                                    echo "unchecked>";
+                                  } 
+                        echo "<label class='custom-control-label' for='delete'>Delete</label>
+                              </div>";
+                      }
+                    if($module_id == 7) {  
+                        echo "<div class='custom-control custom-checkbox mb-3'>
                           <input class='custom-control-input' id='print-labstickers' type='checkbox' name='print_check' value='$print_lab_sticker'"; 
                           if($print_lab_sticker==1) {
                             echo "checked>"; 
@@ -2180,9 +2550,24 @@ elseif ($count_sticker == 0) {
                           else {
                               echo "unchecked>";
                             } 
-                  echo "<label class='custom-control-label' for='print-labstickers'>Print Lab Stickers</label>
-                        </div>
-                        <div class='custom-control custom-checkbox mb-3'>
+                          
+                  echo "<label class='custom-control-label' for='print-labstickers'>Print Sample Collection Stickers - <span class='badge badge-danger badge-lg'>Sample Collection</span></label>";
+                      if($print_lab_sticker==1) {
+                        echo "<div class='row'>
+                            <div class='col-md-6'>
+                              <label class='form-control-label' for='sample_sticker_attempts'>Sample Collection Sticker Attempts
+                              <input class='form-control' name='sample_sticker_attempts' type='number' min='0' max='20' placeholder='number of attempts' id='sample_sticker_attempts' value='$sample_sticker_attempts'>
+                            </div>
+                            <div class='col-md-6'>
+                              <label class='form-control-label' for='print-labstickers-NumberOfTimes'>Number Of Stickers, Allowed To Print</label>
+                              <input class='form-control' name='no_sticker_prints' type='number' min='0' max='99' value='$no_sticker_prints' placeholder='number of times' id='example-text-input'>
+                            </div>
+                          </div>";
+                        }  
+                        
+                  }
+                  echo"</div>";
+                        echo "<div class='custom-control custom-checkbox mb-3'>
                           <input class='custom-control-input' id='biometric' type='checkbox' name='biometric_check' value='$biometric_allow'"; 
                           if($biometric_allow==1) {
                             echo "checked>"; 
@@ -2221,8 +2606,9 @@ elseif ($count_sticker == 0) {
                               echo "unchecked>";
                             }           
                   echo "<label class='custom-control-label' for='now_serving'>Show Now Serving</label>
-                        </div>
-                        <div class='custom-control custom-checkbox mb-3'>
+                        </div>";
+                    if($module_id == 21) {  
+                      echo "<div class='custom-control custom-checkbox mb-3'>
                           <input class='custom-control-input' id='b_plus' type='checkbox' name='b_plus_check' value='$b_plus_rights'"; 
                           if($b_plus_rights==1) {
                             echo "checked=checked>"; 
@@ -2241,8 +2627,10 @@ elseif ($count_sticker == 0) {
                               echo "unchecked>";
                             }
                   echo "<label class='custom-control-label' for='pending'>Pending</label>
-                        </div>
-                        <div class='custom-control custom-checkbox mb-3'>
+                        </div>";
+                      }
+
+                      echo "<div class='custom-control custom-checkbox mb-3'>
                           <input class='custom-control-input' id='search_with_date' type='checkbox' name='search_with_date' value='$search_with_date'"; 
                           if($search_with_date==1) {
                             echo "checked=checked>"; 
@@ -2251,6 +2639,33 @@ elseif ($count_sticker == 0) {
                               echo "unchecked>";
                             }
                   echo "<label class='custom-control-label' for='search_with_date'>Search with date</label>";
+                  if($module_id == 1) { 
+                  echo "<div class='row'>
+                          <div class='col-md-6'>
+                            <label class='form-control-label' for='counter_number'>Counter No. - <span class='badge badge-warning badge-lg'>Registration</span></label>
+                            <input class='form-control' name='counter_no' type='number' min='0' max='6' placeholder='counter number' id='counter_number' value='$counter_no'>
+                          </div>
+                        </div><br>";
+                  }
+                if($module_id == 20)
+                  {
+                  echo "<div class='row'>
+                          <div class='col-md-6'>
+                            <label class='form-control-label' for='lab_sticker_attempts'>Attempts for Print Lab Sticker. - <span class='badge badge-primary badge-lg'>LAB</span></label>
+                            <input class='form-control' name='lab_sticker_attempts' type='number' min='0' max='20' placeholder='number of attempts' id='lab_sticker_attempts' value='$lab_sticker_attempts'>
+                          </div>
+                          <div class='col-md-6'>
+                            <label class='form-control-label' for='lab_sticker'>Print Lab Sticker. - <span class='badge badge-primary badge-lg'>LAB</span></label>
+                            <input class='form-control' name='lab_sticker' type='number' min='0' max='6' placeholder='number of prints' id='lab_sticker' value='$lab_sticker'>
+                          </div>
+                        </div><br>";
+                  }
+                      echo "<div class='row'>
+                          <div class='col-md-6'>
+                            <label class='form-control-label' for='duplicate_sticker'>Duplicate Lab Sticker. - <span class='badge badge-primary badge-lg'>Administration </span></label>
+                            <input class='form-control' name='duplicate_sticker' type='number' min='0' max='6' placeholder='number of prints' id='duplicate_sticker' value='$duplicate_sticker'>
+                          </div>
+                        </div>";
 
                    
 
@@ -2278,6 +2693,7 @@ elseif ($count_sticker == 0) {
 
     $reg_id = $_POST['regID'];
     $medicalstatus = $_POST['medicalstatus'];
+    $cand_status="";
 
     if($medicalstatus == 'Pending') {
 
@@ -2287,9 +2703,8 @@ elseif ($count_sticker == 0) {
 
           $new_status = $data->query("select medical_status from tb_registration where reg_id ='$reg_id'");
           
-          while ($rows = mysqli_fetch_array($new_status)) {
-            $cand_status = $rows['medical_status'];
-          }
+          $rows = mysqli_fetch_array($new_status);
+          $cand_status = $rows['medical_status'];
           echo $cand_status;
 
         }else{
@@ -2298,8 +2713,8 @@ elseif ($count_sticker == 0) {
         
 
     } else {
-
-        medical_status_verify($reg_id);
+        update_medical_status_final($reg_id);
+        // medical_status_verify($reg_id);
         $new_status = $data->query("select medical_status from tb_registration where reg_id ='$reg_id'");
         
         while ($rows = mysqli_fetch_array($new_status)) {
@@ -2310,6 +2725,42 @@ elseif ($count_sticker == 0) {
     }
 
     
+  }
+
+  if($_POST['form_name'] == 'Change Medical Status') 
+  {
+
+    $form_values = $_POST['form_values'];
+    
+    $reg_id = $form_values['0'];
+    $final_status = $form_values['1'];
+    $status_remarks = $form_values['2'];
+
+        $upd_record = mysqli_query($data->con,"UPDATE `tb_registration` SET `medical_status`='$final_status',`updated_by`='$loginuser',`updated_at`='$today_date_with_time',`status_remarks`='$status_remarks' WHERE reg_id='$reg_id'");
+
+        if($upd_record){
+
+          update_medical_status_final($reg_id);
+
+          echo show_message(1,"Record Updated!");
+
+          ?>
+            <script type="text/javascript">
+              document.getElementById('change_result').disabled = true;
+            </script>
+          <?php
+          
+
+        }else{
+          echo show_message(0,"Some Error Occured");
+          ?>
+            <script type="text/javascript">
+              document.getElementById('change_result').disabled = true;
+            </script>
+          <?php
+        }
+
+
   }
 
   // old 
@@ -2352,66 +2803,132 @@ elseif ($count_sticker == 0) {
     $labstatus = $form_values['31'];
     $regID = $form_values['32'];
 
-    
-    $lab_result_insert = array(
-                'reg_id' => mysqli_real_escape_string($data->con, $regID),
-                'barcode' => mysqli_real_escape_string($data->con, $barcode),
-                'HCV' => mysqli_real_escape_string($data->con, $hcv),
-                'HBsAg' => mysqli_real_escape_string($data->con, $hbs_ag),
-                'HIV' => mysqli_real_escape_string($data->con, $hiv),
-                'VDRL' => mysqli_real_escape_string($data->con, $vdrl),
-                'TPHA' => mysqli_real_escape_string($data->con, $tpha),
-                'RBS' => mysqli_real_escape_string($data->con, $rbs),
-                'BIL' => mysqli_real_escape_string($data->con, $bil),
-                'ALT' => mysqli_real_escape_string($data->con, $alt),
-                'AST' => mysqli_real_escape_string($data->con, $ast),
-                'ALK' => mysqli_real_escape_string($data->con, $alk),
-                'Creatinine' => mysqli_real_escape_string($data->con, $creatinine),
-                'blood_group' => mysqli_real_escape_string($data->con, $blood_group),
-                'Haemoglobin' => mysqli_real_escape_string($data->con, $haemoglobin),
-                'Malaria' => mysqli_real_escape_string($data->con, $malaria),
-                'Micro_filariae' => mysqli_real_escape_string($data->con, $micro_filariae),
-                'sugar' => mysqli_real_escape_string($data->con, $sugar),
-                'albumin' => mysqli_real_escape_string($data->con, $albumin),
-                'helminthes' => mysqli_real_escape_string($data->con, $helminthes),
-                'OVA' => mysqli_real_escape_string($data->con, $ova),
-                'CYST' => mysqli_real_escape_string($data->con, $cyst),
-                'TB' => mysqli_real_escape_string($data->con, $tb_test),
-                'pregnancy' => mysqli_real_escape_string($data->con, $pragnancy_test),
-                'polio' => mysqli_real_escape_string($data->con, $polio),
-                'polio_date' => mysqli_real_escape_string($data->con, $poliodate),
-                'MMR1' => mysqli_real_escape_string($data->con, $mmr1),
-                'mmr1_date' => mysqli_real_escape_string($data->con, $mmr1date),
-                'MMR2' => mysqli_real_escape_string($data->con, $mmr2),
-                'mmr2_date' => mysqli_real_escape_string($data->con, $mmr2date),
-                'meningococcal' => mysqli_real_escape_string($data->con, $meningococcal),
-                'meningococcal_date' => mysqli_real_escape_string($data->con, $meningococcaldate),
-                'created_by' => mysqli_real_escape_string($data->con, $loginuser),
-                'center_id' => mysqli_real_escape_string($data->con, $center_id),
-                'lab_status' => mysqli_real_escape_string($data->con, $labstatus)
-                
-            );
-      if($data->insert('tb_lab_result', $lab_result_insert)) {
-        // update tb_registration medical_status column
-         update_medical_status_final($regID);
-          // if ($labstatus == 'UNFIT') {
-          //   $status_upd = mysqli_query($data->con,"update tb_registration set medical_status='$labstatus'
-          //                                        where reg_id='$regID'");
-          // } else {
+    if($regID!=0) {
 
-          //     medical_status_verify($regID);
-          //   // $status_upd = mysqli_query($data->con,"update tb_registration set medical_status='$labstatus'
-          //                                        // where reg_id='$regID'");
-          // }
+        if($loginuser==19) {
+          $lab_result_insert = array(
+                  'reg_id' => mysqli_real_escape_string($data->con, $regID),
+                  'barcode' => mysqli_real_escape_string($data->con, $barcode),
+                  'HCV' => mysqli_real_escape_string($data->con, $hcv),
+                  'HBsAg' => mysqli_real_escape_string($data->con, $hbs_ag),
+                  'HIV' => mysqli_real_escape_string($data->con, $hiv),
+                  'VDRL' => mysqli_real_escape_string($data->con, $vdrl),
+                  'TPHA' => mysqli_real_escape_string($data->con, $tpha),
+                  'RBS' => mysqli_real_escape_string($data->con, $rbs),
+                  'BIL' => mysqli_real_escape_string($data->con, $bil),
+                  'ALT' => mysqli_real_escape_string($data->con, $alt),
+                  'AST' => mysqli_real_escape_string($data->con, $ast),
+                  'ALK' => mysqli_real_escape_string($data->con, $alk),
+                  'Creatinine' => mysqli_real_escape_string($data->con, $creatinine),
+                  'blood_group' => mysqli_real_escape_string($data->con, $blood_group),
+                  'Haemoglobin' => mysqli_real_escape_string($data->con, $haemoglobin),
+                  'Malaria' => mysqli_real_escape_string($data->con, $malaria),
+                  'Micro_filariae' => mysqli_real_escape_string($data->con, $micro_filariae),
+                  'sugar' => mysqli_real_escape_string($data->con, $sugar),
+                  'albumin' => mysqli_real_escape_string($data->con, $albumin),
+                  'helminthes' => mysqli_real_escape_string($data->con, $helminthes),
+                  'OVA' => mysqli_real_escape_string($data->con, $ova),
+                  'CYST' => mysqli_real_escape_string($data->con, $cyst),
+                  'TB' => mysqli_real_escape_string($data->con, $tb_test),
+                  'pregnancy' => mysqli_real_escape_string($data->con, $pragnancy_test),
+                  'polio' => mysqli_real_escape_string($data->con, $polio),
+                  'polio_date' => mysqli_real_escape_string($data->con, $poliodate),
+                  'MMR1' => mysqli_real_escape_string($data->con, $mmr1),
+                  'mmr1_date' => mysqli_real_escape_string($data->con, $mmr1date),
+                  'MMR2' => mysqli_real_escape_string($data->con, $mmr2),
+                  'mmr2_date' => mysqli_real_escape_string($data->con, $mmr2date),
+                  'meningococcal' => mysqli_real_escape_string($data->con, $meningococcal),
+                  'meningococcal_date' => mysqli_real_escape_string($data->con, $meningococcaldate),
+                  'created_by' => mysqli_real_escape_string($data->con, $loginuser),
+                  'center_id' => mysqli_real_escape_string($data->con, $center_id),
+                  'lab_status' => mysqli_real_escape_string($data->con, $labstatus)
+                  
+              );
+          if($data->insert('tb_lab_result', $lab_result_insert)) {
+            // update tb_registration medical_status column
+             update_medical_status_final($regID);
 
-        echo show_message(1,"Record Saved!");
-      }
-      else 
+            echo show_message(1,"Record Saved!");
+            ?>
+             <script type="text/javascript">
+                document.getElementById('lab_result_form').disabled = true;
+              </script>
+            <?php
+          }
+        }
+        else {
+          $get_cand_data = $data->query("SELECT * FROM tb_lab_sticker WHERE (sticker_value_2 = '$barcode' OR reg_id = '$regID') and sticker_value_2 != ''");
+          $count_result = mysqli_num_rows($get_cand_data);
+          if($count_result  > 0)
+          {
+            $lab_result_insert = array(
+                  'reg_id' => mysqli_real_escape_string($data->con, $regID),
+                  'barcode' => mysqli_real_escape_string($data->con, $barcode),
+                  'HCV' => mysqli_real_escape_string($data->con, $hcv),
+                  'HBsAg' => mysqli_real_escape_string($data->con, $hbs_ag),
+                  'HIV' => mysqli_real_escape_string($data->con, $hiv),
+                  'VDRL' => mysqli_real_escape_string($data->con, $vdrl),
+                  'TPHA' => mysqli_real_escape_string($data->con, $tpha),
+                  'RBS' => mysqli_real_escape_string($data->con, $rbs),
+                  'BIL' => mysqli_real_escape_string($data->con, $bil),
+                  'ALT' => mysqli_real_escape_string($data->con, $alt),
+                  'AST' => mysqli_real_escape_string($data->con, $ast),
+                  'ALK' => mysqli_real_escape_string($data->con, $alk),
+                  'Creatinine' => mysqli_real_escape_string($data->con, $creatinine),
+                  'blood_group' => mysqli_real_escape_string($data->con, $blood_group),
+                  'Haemoglobin' => mysqli_real_escape_string($data->con, $haemoglobin),
+                  'Malaria' => mysqli_real_escape_string($data->con, $malaria),
+                  'Micro_filariae' => mysqli_real_escape_string($data->con, $micro_filariae),
+                  'sugar' => mysqli_real_escape_string($data->con, $sugar),
+                  'albumin' => mysqli_real_escape_string($data->con, $albumin),
+                  'helminthes' => mysqli_real_escape_string($data->con, $helminthes),
+                  'OVA' => mysqli_real_escape_string($data->con, $ova),
+                  'CYST' => mysqli_real_escape_string($data->con, $cyst),
+                  'TB' => mysqli_real_escape_string($data->con, $tb_test),
+                  'pregnancy' => mysqli_real_escape_string($data->con, $pragnancy_test),
+                  'polio' => mysqli_real_escape_string($data->con, $polio),
+                  'polio_date' => mysqli_real_escape_string($data->con, $poliodate),
+                  'MMR1' => mysqli_real_escape_string($data->con, $mmr1),
+                  'mmr1_date' => mysqli_real_escape_string($data->con, $mmr1date),
+                  'MMR2' => mysqli_real_escape_string($data->con, $mmr2),
+                  'mmr2_date' => mysqli_real_escape_string($data->con, $mmr2date),
+                  'meningococcal' => mysqli_real_escape_string($data->con, $meningococcal),
+                  'meningococcal_date' => mysqli_real_escape_string($data->con, $meningococcaldate),
+                  'created_by' => mysqli_real_escape_string($data->con, $loginuser),
+                  'center_id' => mysqli_real_escape_string($data->con, $center_id),
+                  'lab_status' => mysqli_real_escape_string($data->con, $labstatus)
+                  
+              );
+            if($data->insert('tb_lab_result', $lab_result_insert)) {
+              // update tb_registration medical_status column
+               update_medical_status_final($regID);
+
+              echo show_message(1,"Record Saved!");
+              ?>
+               <script type="text/javascript">
+                  document.getElementById('lab_result_form').disabled = true;
+                </script>
+              <?php
+            }
+          }
+          
+        }
+    }
+
+      else {
+
         echo show_message(0,"Some error occured. Try Again Later.");
+              ?>
+               <script type="text/javascript">
+                  document.getElementById('lab_result_form').disabled = true;
+                </script>
+              <?php
+
+      }
 
   }
 
-    if($_POST['form_name'] == 'Lab Result Update') 
+  if($_POST['form_name'] == 'Lab Result Update') 
   {
 
     $form_values = $_POST['form_values'];
@@ -2512,7 +3029,9 @@ elseif ($count_sticker == 0) {
 
         $upd_record = mysqli_query($data->con,"UPDATE `tb_lab_result` SET `reg_id`='$regID', `HCV`='$hcv',`HBsAg`='$hbs_ag',`HIV`='$hiv',`VDRL`='$vdrl',`TPHA`='$tpha',`RBS`='$rbs',`BIL`='$bil',`ALT`='$alt',`AST`='$ast',`ALK`='$alk',`Creatinine`='$creatinine',`blood_group`='$blood_group',`Haemoglobin`='$haemoglobin',`Malaria`='$malaria',`Micro_filariae`='$micro_filariae',`sugar`='$sugar',`albumin`='$albumin',`helminthes`='$helminthes',`OVA`='$ova',`CYST`='$cyst',`TB`='$tb_test',`pregnancy`='$pragnancy_test',`polio`='$polio',`polio_date`='$poliodate',`MMR1`='$mmr1',`mmr1_date`='$mmr1date',`MMR2`='$mmr2',`mmr2_date`='$mmr2date',`meningococcal`='$meningococcal',`meningococcal_date`='$meningococcaldate', `lab_status` = '$labstatus' WHERE (reg_id='$regID' or barcode='$barcode')");
         if($upd_record){
+
           update_medical_status_final($regID);
+
           echo show_message(1,"Record Updated!");
         }else{
           echo show_message(0,"Some Error Occured");
@@ -2560,6 +3079,7 @@ elseif ($count_sticker == 0) {
                  }else{
 
                   if(print_lab_sticker_rights($loginID,20) == 1){
+
                   echo "<button type='button' id='printsticker2' name='printsticker2' class='btn btn-primary' onclick='print_sticker2(user_type);'>Print Lab Sticker</button>";  
 
                                            
@@ -2573,6 +3093,32 @@ elseif ($count_sticker == 0) {
       //echo "<img alt='barcode' src='./barcode/barcode.php?codetype=Code39&size=40&text=".$barcode_value."&print=true'>";
 
     }else{
+      echo show_message(0,"No Record Found");
+    }
+
+  }
+
+  if($_POST['form_name'] == 'Change Lab Sticker Attempts'){
+
+    $reg_date = $_POST['reg_date'];
+    $serial_no = $_POST['serial_no'];
+    $loginID = $_POST['loginID'];
+    $UserType = $_POST['UserType'];
+    ?>
+    <script type="text/javascript">
+      var user_type = '<?php echo $UserType ?>';
+      var sticker1 = '<?php echo $barcode_sticker1 ?>';
+    </script>
+    <?php
+
+    $get_records = $data->query("SELECT * FROM `tb_lab_sticker` WHERE `sticker_value_1` IS NOT NULL AND reg_date='$reg_date' AND serial_no='$serial_no'");
+    $count_rows=mysqli_num_rows($get_records);
+
+    if($count_rows > 0) {
+
+      
+
+    } else{
       echo show_message(0,"No Record Found");
     }
 
@@ -2941,13 +3487,27 @@ elseif ($count_sticker == 0) {
     global $today_date;
     global $token_prefix;
 
-    $token_num = isset($_POST['token_num']);
+    // $token_num = isset($_POST['token_num']);
+    $check_record = $data->query("select counter_no from user_action_rights where user_id='$loginuser' and module_id='1'");
+      while ($rows=mysqli_fetch_array($check_record)) {
+        $counter_no = $rows['counter_no'];
+        if($counter_no!='0') {
+          ?>
+            <script type="text/javascript">
+              document.getElementById("counter").value = '<?php echo $counter_no ?>';
+            </script>
+          <?php
+        }
+      }
 
+    //    old query
+    // select t.token_no from tb_ongoing_tokens t, medical_process m where m.process_id=t.process_id and token_date='$today_date' order by t.tr_id ASC
      
-    $get_ongoing_token_query = $data->query("select t.token_no from tb_ongoing_tokens t, medical_process m where m.process_id=t.process_id and token_date='$today_date' order by t.tr_id DESC");
+    $get_ongoing_token_query = $data->query("select token_no from tb_queue_manager where process_id='1' and process_date='$today_date' and status='Completed' and counter_id='$counter_no' order by q_id DESC");
+
 
       $rows=mysqli_fetch_array($get_ongoing_token_query);
-        $token_no = $rows['token_no'];
+      $token_no = $rows['token_no'];
 
         // welcome screen token number
            echo $token_prefix.$token_no;
@@ -3136,7 +3696,7 @@ function medical_check_notification($reg_id){
 function lab_check_notification($reg_id){
   global $data;
   //52
-  $get_lab_Check = $data->query("select u.user_name,t.created_on,t.lab_status from tb_lab_result t,user u,tb_lab_sticker s where s.reg_id='$reg_id' and t.created_by=u.user_id and t.barcode = s.sticker_value_2 order by t.created_on desc limit 1");
+  $get_lab_Check = $data->query("select u.user_name,t.created_on,t.lab_status from tb_lab_result t,user u,tb_lab_sticker s where t.reg_id='$reg_id' and t.created_by=u.user_id and t.barcode = s.sticker_value_2 order by t.created_on desc limit 1");
 
  // alert_box($get_lab_Check);
 
@@ -3247,80 +3807,83 @@ function get_current_token()
     global $token_prefix;
     
 
-
-if(isset($_POST['call_token']))
-{
-  $curr_token= $_POST['token_number'];
-  $process_id= $_POST['processid'];
-  $token_no = "";
-
-  //token update to completion status
-  $upd = mysqli_query($data->con,"update tb_queue_manager set status='Completed' where token_no='$curr_token' and process_id='$process_id' and process_date='$today_date'");
-  
-  //old query 
-
-  // select MIN(token_no) as token_no,q_id from tb_queue_manager where process_id='$process_id' and status='Pending' and process_date='$today_date' order by q_id ASC LIMIT 1
-$get_token_query = $data->query("select token_no as token_no,q_id from tb_queue_manager where process_id='$process_id' and status='Pending' and process_date='$today_date' order by q_id ASC LIMIT 1");
-  $count_rows=mysqli_num_rows($get_token_query);
-  if($count_rows == 1)
+  if(isset($_POST['call_token']))
   {
-    while($query_result=mysqli_fetch_array($get_token_query))
-          {
-           
-            $q_id = $query_result['q_id'];
-            $token_no = $query_result['token_no'];  
-          }
-
-          $insert_token = array(
-                'token_no' => mysqli_real_escape_string($data->con, $token_no),
-                'process_id' => mysqli_real_escape_string($data->con, $process_id),
-                'q_id' => mysqli_real_escape_string($data->con, $q_id),
-                'token_date' => mysqli_real_escape_string($data->con, $today_date)
-                
-            );
-
-          $data->insert('tb_ongoing_tokens', $insert_token);
-
-  }
-   return $token_no;
-}
-
-if(isset($_POST['new_call_token']))
-{
-  $curr_token= $_POST['token_number2'];
-  $process_id= $_POST['processid'];
-
-  $check_process_done = mysqli_query($data->con,"select * from tb_queue_manager where token_no='$curr_token' and process_id='$process_id' and process_date='$today_date' and status='Completed'");
-  $count_process_done = mysqli_num_rows($check_process_done);
-  if($count_process_done > 0){
-
-    alert('Already Done');
-  
-  }else{
-
-    $get_token_query = $data->query("select q_id from tb_queue_manager where token_no='$curr_token' and process_id='$process_id' and status='Pending' and process_date='$today_date'");
-     while($query_result=mysqli_fetch_array($get_token_query))
-          {
-           
-            $q_id = $query_result['q_id'];
-            //$token_no = $query_result['token_no'];  
-          }
-
-          $insert_token = array(
-                'token_no' => mysqli_real_escape_string($data->con, $curr_token),
-                'process_id' => mysqli_real_escape_string($data->con, $process_id),
-                'q_id' => mysqli_real_escape_string($data->con, $q_id),
-                'token_date' => mysqli_real_escape_string($data->con, $today_date)
-                
-            );
-
-          $data->insert('tb_ongoing_tokens', $insert_token);
+    $curr_token= $_POST['token_number'];
+    $process_id= $_POST['processid'];
+    $counter_no= $_POST['counter'];
+    $token_no = "";
 
 
+    $get_token_query = $data->query("select token_no as token_no,q_id from tb_queue_manager where process_id='$process_id' and status = 'Pending' and process_date='$today_date' and counter_id is null order by q_id ASC LIMIT 1");
+    $count_rows=mysqli_num_rows($get_token_query);
+    if($count_rows == 1)
+    {
+      while($query_result=mysqli_fetch_array($get_token_query))
+            {
+             
+              $q_id = $query_result['q_id'];
+              $token_no = $query_result['token_no'];
+
+            }
+
+            $insert_token = array(
+                  'token_no' => mysqli_real_escape_string($data->con, $token_no),
+                  'process_id' => mysqli_real_escape_string($data->con, $process_id),
+                  'q_id' => mysqli_real_escape_string($data->con, $q_id),
+                  'token_date' => mysqli_real_escape_string($data->con, $today_date)
+                  
+              );
+
+            $data->insert('tb_ongoing_tokens', $insert_token);
+
+            //should be run only once
+            if($curr_token == ""){
+              $upd = mysqli_query($data->con,"update tb_queue_manager set status='Completed',counter_id='$counter_no' where token_no='$token_no' and process_id='$process_id' and process_date='$today_date'");
+            }else{
+                $upd = mysqli_query($data->con,"update tb_queue_manager set status='Completed',counter_id='$counter_no' where token_no='$token_no' and process_id='$process_id' and process_date='$today_date'");
+            }
+
+    }
+     return $token_no;
   }
 
-   return $curr_token;
-}
+  if(isset($_POST['new_call_token']))
+  {
+    $curr_token= $_POST['token_number2'];
+    $process_id= $_POST['processid'];
+
+    $check_process_done = mysqli_query($data->con,"select * from tb_queue_manager where token_no='$curr_token' and process_id='$process_id' and process_date='$today_date' and status='Completed'");
+    $count_process_done = mysqli_num_rows($check_process_done);
+    if($count_process_done > 0){
+
+      alert('Already Done');
+    
+    }else{
+
+      $get_token_query = $data->query("select q_id from tb_queue_manager where token_no='$curr_token' and process_id='$process_id' and status='Pending' and process_date='$today_date'");
+       while($query_result=mysqli_fetch_array($get_token_query))
+            {
+             
+              $q_id = $query_result['q_id'];
+              //$token_no = $query_result['token_no'];  
+            }
+
+            $insert_token = array(
+                  'token_no' => mysqli_real_escape_string($data->con, $curr_token),
+                  'process_id' => mysqli_real_escape_string($data->con, $process_id),
+                  'q_id' => mysqli_real_escape_string($data->con, $q_id),
+                  'token_date' => mysqli_real_escape_string($data->con, $today_date)
+                  
+              );
+
+            $data->insert('tb_ongoing_tokens', $insert_token);
+
+
+    }
+
+     return $curr_token;
+  }
 
 }
 
@@ -3356,7 +3919,7 @@ function tokens_in_queue($processID)
 
   if($processID == 1){
 
-    $get_token_query = $data->query("select count(status) as total_pending from tb_queue_manager WHERE process_id = '$processID' and process_date = '$today_date' and status='Pending'");
+    $get_token_query = $data->query("select count(status) as total_pending from tb_queue_manager WHERE process_id = '$processID' and process_date = '$today_date' and status='Pending' and counter_id is null");
   }else{
 
     $get_token_query = $data->query("select count(*) as total_pending 
@@ -3700,7 +4263,7 @@ function get_history_pdf($fromdate="",$todate="")
   if($fromdate == "" && $todate == "")
   {
     
-      $process_query = $data->query("select reg_date,serial_no,passport_no,candidate_name,son_of,country,agency,medical_status from tb_registration LIMIT 0,49");
+      $process_query = $data->query("select reg_date,serial_no,passport_no,candidate_name,son_of,country,agency,medical_status from tb_registration");
       
       return $process_query;
   }
@@ -4146,7 +4709,7 @@ function get_medical_lab_report_pdf($barcode_num)
 {
   global $data;
 
-    $process_query = $data->query("select candidate_name,serial_no,passport_no,country,phone_1,reg_date,barcode_no,token_no,created_at from tb_registration where barcode_no='$barcode_num'");
+    $process_query = $data->query("select candidate_name,serial_no,passport_no,country,phone_1,reg_date,barcode_no,token_no,created_at,profession from tb_registration where barcode_no='$barcode_num'");
     // select candidate_name,serial_no,passport_no,country,reg_date,barcode_no,created_at from tb_registration where barcode_no = '$barcode_num'
       
       return $process_query;
@@ -4258,7 +4821,7 @@ function edit_user()
   global $user_id;
 
   if(isset($_POST['update_user'])) {
-    $username = $_POST['u_username'];
+    $username = str_replace(' ', '-', $_POST['u_username']);
     $pass = $_POST['u_password'];
     $pwd_hash = password_hash($pass, PASSWORD_DEFAULT);
       
@@ -4384,7 +4947,7 @@ function create_new_user()
   global $center_id;
   if(isset($_POST['create_user']))
   {
-      $username = $_POST['u_username'];
+      $username = str_replace(' ', '-', $_POST['u_username']);
       $password = $_POST['u_password'];
       $pwd_hash = password_hash($password, PASSWORD_DEFAULT);
       $status=1;
@@ -4393,7 +4956,7 @@ function create_new_user()
     $count_user=mysqli_num_rows($check_user);
     if($count_user == 0)
     {
-        $insert_user = array(
+          $insert_user = array(
               'user_name' => mysqli_real_escape_string($data->con, $username),
               'user_password' => mysqli_real_escape_string($data->con, $pwd_hash),
               'status' => mysqli_real_escape_string($data->con, $status),
@@ -4413,12 +4976,12 @@ function create_new_user()
     }
     else {
       echo "<div class='alert alert-warning alert-dismissible fade show' role='alert'>
-                  <span class='alert-icon'><i class='ni ni-like-2'></i></span>
-                  <span class='alert-text'><strong>Failed! </strong>User $username Already Created!</span>
-                  <button type='button' class='close' data-dismiss='alert' aria-label='Close'>
-                    <span aria-hidden='true'>&times;</span>
-                  </button>
-                </div>";
+              <span class='alert-icon'><i class='ni ni-like-2'></i></span>
+              <span class='alert-text'><strong>Failed! </strong>User $username Already Created!</span>
+              <button type='button' class='close' data-dismiss='alert' aria-label='Close'>
+                <span aria-hidden='true'>&times;</span>
+              </button>
+            </div>";
     }
   }
 }
@@ -4504,7 +5067,7 @@ function create_user_rights()
 
       if(!empty($_POST['check_list'])) {
         foreach($_POST['check_list'] as $selected) {
-
+              alert_box('module id: '.$selected);
               $insert_rights = array(
               'user_id' => mysqli_real_escape_string($data->con, $selected_user_id),
               'module_id' => mysqli_real_escape_string($data->con, $selected),
@@ -4548,7 +5111,7 @@ function get_all_modules()
 function get_user_actions()
 {
   global $data;
-  $get_user_rights_query = $data->query("SELECT r.action_id,u.user_name,m.module_desc,IF(r.edit_rights = 0, 'No','Yes') as edit_rights,IF(r.delete_rights = 0, 'No','Yes') as delete_rights,IF(r.barcode_verification = 0, 'No','Yes') as generate_barcode,IF(r.print_lab_sticker = 0, 'No','Yes') as print_lab_sticker,IF(r.biometric_allow = 0, 'No','Yes') as allow_biometric,IF(r.serial_no_rights = 0, 'No','Yes') as serial_no_rights,IF(r.now_serving_rights = 0, 'No','Yes') as now_serving_rights from user_action_rights r, user u, module_setup m where r.module_id=m.module_id and r.user_id=u.user_id");
+  $get_user_rights_query = $data->query("SELECT r.action_id,u.user_name,m.module_desc,IF(r.edit_rights = 0, 'No','Yes') as edit_rights,IF(r.delete_rights = 0, 'No','Yes') as delete_rights,IF(r.barcode_verification = 0, 'No','Yes') as generate_barcode,IF(r.print_lab_sticker = 0, 'No','Yes') as print_lab_sticker,IF(r.biometric_allow = 0, 'No','Yes') as allow_biometric,IF(r.serial_no_rights = 0, 'No','Yes') as serial_no_rights,IF(r.now_serving_rights = 0, 'No','Yes') as now_serving_rights,IF(r.date_search_rights = 0, 'No','Yes') as search_with_date from user_action_rights r, user u, module_setup m where r.module_id=m.module_id and r.user_id=u.user_id");
     $i=1;
     while ($rows = mysqli_fetch_array($get_user_rights_query)) {
       $action_id = $rows['action_id'];
@@ -4561,6 +5124,7 @@ function get_user_actions()
       $biometric_allow = $rows['allow_biometric'];
       $serial_no = $rows['serial_no_rights'];
       $now_serving = $rows['now_serving_rights'];
+      $search_with_date = $rows['search_with_date'];
 
       // <tbody>
         echo "<tr>";
@@ -4575,25 +5139,67 @@ function get_user_actions()
             echo "<span class=text-muted>$module_name</span>";
           echo "</td>";
           echo "<td>";
-            echo "<span class=text-muted>$edit_rights</span>";
+          if($edit_rights == 'Yes') {
+            echo "<i class='fas fa-check text-success'></i>";
+          } else {
+            echo "<i class='fas fa-times text-danger'></i>";
+          }
           echo "</td>";
           echo "<td>";
-            echo "<span class=text-muted>$delete_rights</span>";
+          if($delete_rights == 'Yes') {
+            echo "<i class='fas fa-check text-success'></i>";
+          } else {
+            echo "<i class='fas fa-times text-danger'></i>";
+          }
+            // echo "<span class=text-muted>$delete_rights</span>";
           echo "</td>";
           echo "<td>";
-            echo "<span class=text-muted>$generate_barcode_rights</span>";
+          if($generate_barcode_rights == 'Yes') {
+            echo "<i class='fas fa-check text-success'></i>";
+          } else {
+            echo "<i class='fas fa-times text-danger'></i>";
+          }
+            // echo "<span class=text-muted>$generate_barcode_rights</span>";
           echo "</td>";
           echo "<td>";
-            echo "<span class=text-muted>$print_lab_sticker</span>";
+          if($print_lab_sticker == 'Yes') {
+            echo "<i class='fas fa-check text-success'></i>";
+          } else {
+            echo "<i class='fas fa-times text-danger'></i>";
+          }
+            // echo "<span class=text-muted>$print_lab_sticker</span>";
           echo "</td>";
           echo "<td>";
-            echo "<span class=text-muted>$biometric_allow</span>";
+          if($biometric_allow == 'Yes') {
+            echo "<i class='fas fa-check text-success'></i>";
+          } else {
+            echo "<i class='fas fa-times text-danger'></i>";
+          }
+            // echo "<span class=text-muted>$biometric_allow</span>";
           echo "</td>";
           echo "<td>";
-            echo "<span class=text-muted>$serial_no</span>";
+          if($serial_no == 'Yes') {
+            echo "<i class='fas fa-check text-success'></i>";
+          } else {
+            echo "<i class='fas fa-times text-danger'></i>";
+          }
+            // echo "<span class=text-muted>$serial_no</span>";
           echo "</td>";
           echo "<td>";
-            echo "<span class=text-muted>$now_serving</span>";
+          if($now_serving == 'Yes') {
+            echo "<i class='fas fa-check text-success'></i>";
+          } else {
+            echo "<i class='fas fa-times text-danger'></i>";
+          }
+            // echo "<span class=text-muted>$now_serving</span>";
+          echo "</td>";
+          echo "<td>";
+          if($search_with_date == 'Yes') {
+            echo "<i class='fas fa-check text-success'></i>";
+          } else {
+            echo "<i class='fas fa-times text-danger'></i>";
+          }
+            // echo "<span class=text-muted>$search_with_date</span>";
           echo "</td>";
           echo "<td class='table-actions'>";
             echo "<a href=user_role?actionid=$action_id&&username=$user_name target=_self class='table-action table-action-delete' data-toggle='tooltip' data-original-title='Remove action'>";
@@ -4613,6 +5219,8 @@ function create_user_action_rights()
   global $edit_checkbx;
   global $del_checkbx;
   global $print_checkbx;
+  global $sample_sticker_attempts_input;
+  global $no_sticker_input;
   global $biometric_checkbx;
   global $barcode_checkbx;
   global $serial_no_checkbx;
@@ -4620,6 +5228,10 @@ function create_user_action_rights()
   global $b_plus_checkbx;
   global $pending_checkbx;
   global $date_checkbx;
+  global $counter_no_input;
+  global $lab_sticker_attempts_input;
+  global $lab_sticker_input;
+  global $duplicate_sticker_input;
   global $center_id;
 
   if(isset($_POST['save_actions']))
@@ -4638,9 +5250,18 @@ function create_user_action_rights()
           $del_checkbx = "0";
 
       if(isset($_POST['print_check'])) {
-        $print_checkbx = "1"; }
+        $print_checkbx = "1";
+        $no_sticker_input = $_POST['no_sticker_prints'];
+        // alert_box($no_sticker_input);
+      }
         else
           $print_checkbx = "0";
+
+      if(isset($_POST['sample_sticker_attempts'])) {
+        $sample_sticker_attempts_input = $_POST['sample_sticker_attempts']; 
+      } else {
+        $sample_sticker_attempts_input = "0";
+      }
 
       if(isset($_POST['biometric_check'])) {
         $biometric_checkbx = "1"; }
@@ -4677,6 +5298,28 @@ function create_user_action_rights()
         else
           $date_checkbx = "0";
 
+      if(isset($_POST['counter_no'])) {
+        $counter_no_input = $_POST['counter_no']; 
+      }
+        else
+          $counter_no_input = "0";
+
+      if(isset($_POST['lab_sticker_attempts'])) {
+        $lab_sticker_attempts_input = $_POST['lab_sticker_attempts']; 
+      }
+
+      if(isset($_POST['lab_sticker'])) {
+        $lab_sticker_input = $_POST['lab_sticker']; 
+      }
+        else
+          $lab_sticker_input = "0";
+
+      if(isset($_POST['duplicate_sticker'])) {
+        $duplicate_sticker_input = $_POST['duplicate_sticker']; 
+      }
+        else
+          $duplicate_sticker_input = "0";
+
   
             $insert_actions = array(
               'user_id' => mysqli_real_escape_string($data->con, $selected_user_id),
@@ -4685,12 +5328,18 @@ function create_user_action_rights()
               'delete_rights' => mysqli_real_escape_string($data->con, $del_checkbx),
               'barcode_verification' => mysqli_real_escape_string($data->con, $barcode_checkbx),
               'print_lab_sticker' => mysqli_real_escape_string($data->con, $print_checkbx),
+              'sample_sticker_attempts' => mysqli_real_escape_string($data->con, $sample_sticker_attempts_input),
+              'no_sticker_prints' => mysqli_real_escape_string($data->con, $no_sticker_input),
               'biometric_allow' => mysqli_real_escape_string($data->con, $biometric_checkbx),
               'serial_no_rights' => mysqli_real_escape_string($data->con, $serial_no_checkbx),
               'b_plus_rights' => mysqli_real_escape_string($data->con, $b_plus_checkbx),
               'pending_rights' => mysqli_real_escape_string($data->con, $pending_checkbx),
               'now_serving_rights' => mysqli_real_escape_string($data->con, $now_serving_checkbx),
               'date_search_rights' => mysqli_real_escape_string($data->con, $date_checkbx),
+              'counter_no' => mysqli_real_escape_string($data->con, $counter_no_input),
+              'lab_sticker_attempts' => mysqli_real_escape_string($data->con, $lab_sticker_attempts_input),
+              'lab_sticker' => mysqli_real_escape_string($data->con, $lab_sticker_input),
+              'duplicate_sticker' => mysqli_real_escape_string($data->con, $duplicate_sticker_input),
               'center_id' => mysqli_real_escape_string($data->con, $center_id)
               
           );    
@@ -4710,89 +5359,7 @@ function create_user_action_rights()
       echo "<b>Please Select Atleast One Option.</b>";
     } */
 }
-// function create_user_action_rights()
-// {
-//   global $data;
-//   global $selected_user_id;
-//   global $edit_checkbx;
-//   global $del_checkbx;
-//   global $print_checkbx;
-//   global $biometric_checkbx;
-//   global $barcode_checkbx;
-//   global $serial_no_checkbx;
-//   global $now_serving_checkbx;
-//   global $center_id;
 
-//   if(isset($_POST['save_actions']))
-//   {
-//       $selected_user_id = $_POST['select_user'];
-//       $selected_module_id = $_POST['select_module'];
-
-//       if(isset($_POST['edit_check'])) {
-//         $edit_checkbx = "1"; }
-//         else
-//           $edit_checkbx = "0";
-
-//       if(isset($_POST['delete_check'])) {
-//         $del_checkbx = "1"; }
-//         else
-//           $del_checkbx = "0";
-
-//       if(isset($_POST['print_check'])) {
-//         $print_checkbx = "1"; }
-//         else
-//           $print_checkbx = "0";
-
-//       if(isset($_POST['biometric_check'])) {
-//         $biometric_checkbx = "1"; }
-//         else
-//           $biometric_checkbx = "0";
-
-//       if(isset($_POST['barcod_check'])) {
-//         $barcode_checkbx = "1"; }
-//         else
-//           $barcode_checkbx = "0";
-
-//       if(isset($_POST['serial_no_check'])) {
-//         $serial_no_checkbx = "1"; }
-//         else
-//           $serial_no_checkbx = "0";
-
-//       if(isset($_POST['now_serving_check'])) {
-//         $now_serving_checkbx = "1"; }
-//         else
-//           $now_serving_checkbx = "0";
-
-  
-//             $insert_actions = array(
-//               'user_id' => mysqli_real_escape_string($data->con, $selected_user_id),
-//               'module_id' => mysqli_real_escape_string($data->con, $selected_module_id),
-//               'edit_rights' => mysqli_real_escape_string($data->con, $edit_checkbx),
-//               'delete_rights' => mysqli_real_escape_string($data->con, $del_checkbx),
-//               'barcode_verification' => mysqli_real_escape_string($data->con, $barcode_checkbx),
-//               'print_lab_sticker' => mysqli_real_escape_string($data->con, $print_checkbx),
-//               'biometric_allow' => mysqli_real_escape_string($data->con, $biometric_checkbx),
-//               'serial_no_rights' => mysqli_real_escape_string($data->con, $serial_no_checkbx),
-//               'now_serving_rights' => mysqli_real_escape_string($data->con, $now_serving_checkbx),
-//               'center_id' => mysqli_real_escape_string($data->con, $center_id)
-              
-//           );    
-
-//         $data->insert('user_action_rights', $insert_actions);
-
-//           echo "<div class='alert alert-success alert-dismissible fade show' role='alert'>
-//                   <span class='alert-icon'><i class='ni ni-like-2'></i></span>
-//                   <span class='alert-text'><strong>Success! </strong>Actions assigned to User!</span>
-//                   <button type='button' class='close' data-dismiss='alert' aria-label='Close'>
-//                     <span aria-hidden='true'>&times;</span>
-//                   </button>
-//                 </div>"; 
-
-//   }
-//     /*else {
-//       echo "<b>Please Select Atleast One Option.</b>";
-//     } */
-// }
 
 function remove_user_action_rights()
 {
@@ -4982,6 +5549,8 @@ function get_data_by_serial()
   global $marital_status;
   global $remarks;
   global $cand_img;
+  global $slip_issue_date;
+  global $slip_expiry_date;
 
     if(isset($_POST['search_candidate']))
     {
@@ -4992,15 +5561,19 @@ function get_data_by_serial()
       if(isset($_POST['search_with_date'])) {
           $search_with_date = date('Y-m-d',strtotime($_POST['search_with_date']));
 
-          $process_query = $data->query("select reg_id,barcode_no,passport_no,serial_no,passport_issue_date,passport_expiry_date,place_of_issue,reg_date,agency,country,
-        profession,fee_charged,candidate_name,cnic,son_of,nationality,d_o_b,phone_1,phone_2,gender,marital_status,remarks,candidate_img
-        from tb_registration where serial_no='$serial_no' AND reg_date='$search_with_date'");
+          $process_query = $data->query("select reg_id,barcode_no,passport_no,serial_no,passport_issue_date,passport_expiry_date,place_of_issue,reg_date,agency,
+            country,profession,fee_charged,candidate_name,cnic,son_of,nationality,d_o_b,phone_1,phone_2,gender,marital_status,remarks,candidate_img,slip_issue_date,slip_expiry_date
+            from tb_registration where serial_no='$serial_no' AND reg_date='$search_with_date'");
+
+          
 
       } else {
 
-          $process_query = $data->query("select reg_id,barcode_no,passport_no,serial_no,passport_issue_date,passport_expiry_date,place_of_issue,reg_date,agency,country,
-        profession,fee_charged,candidate_name,cnic,son_of,nationality,d_o_b,phone_1,phone_2,gender,marital_status,remarks,candidate_img
-        from tb_registration where serial_no='$serial_no' || passport_no='$passport_number'");
+          $process_query = $data->query("select reg_id,barcode_no,passport_no,serial_no,passport_issue_date,passport_expiry_date,place_of_issue,reg_date,agency,
+            country,profession,fee_charged,candidate_name,cnic,son_of,nationality,d_o_b,phone_1,phone_2,gender,marital_status,remarks,candidate_img,slip_issue_date,slip_expiry_date
+            from tb_registration where serial_no='$serial_no' || passport_no='$passport_number'");
+
+          
 
       }
 
@@ -5015,7 +5588,7 @@ function get_data_by_serial()
           $passport_expiry_date=date("d-m-Y",strtotime($passport_expiryDate));
           $place_of_issue = $row['place_of_issue'];
           $regDate = $row['reg_date'];
-          $reg_date=date("d-m-Y",strtotime($regDate));
+          $reg_date=date("d/m/Y",strtotime($regDate));
           $agency = $row['agency'];
           $country = $row['country'];
           $profession = $row['profession'];
@@ -5032,6 +5605,8 @@ function get_data_by_serial()
           $marital_status = $row['marital_status'];
           $remarks = $row['remarks'];
           $cand_img = $row['candidate_img'];
+          $slip_issue_date = $row['slip_issue_date'];
+          $slip_expiry_date = $row['slip_expiry_date'];
         }
       }
 }
@@ -5070,21 +5645,36 @@ function edit_registered_candidate()
       $remarks = $_POST['remarks'];
       $serial_new = $_POST['serial_new'];
       $candidate_img = $_POST['img_name'];
+      $slip_issue_date = $_POST['slip_issue_date'];
+      $slip_expiry_date = $_POST['slip_expiry_date'];
+      $myDateTime = DateTime::createFromFormat('d/m/Y', $_POST['reg_date']);
+      $new_reg_date = $myDateTime->format('Y-m-d');
+
 
       if($candidate_img) {
 
-          $run_Query = $data->query("update tb_registration set passport_no='$passport_no', passport_issue_date='$pp_i_d_strd', passport_expiry_date='$pp_ex_d_strd', place_of_issue='$place_of_issue', agency='$agency', country='$country', profession='$profession', fee_charged='$fee_charged', candidate_name='$candidate_name', cnic='$cnic', son_of='$son_of', nationality='$nationality', d_o_b='$d_o_b_strd', phone_1='$phone_1', phone_2='$phone_2', gender='$gender', marital_status='$marital_status', remarks='$remarks',serial_no='$serial_new',candidate_img='$candidate_img' where reg_id='$regid'");
+          $run_Query = $data->query("update tb_registration set passport_no='$passport_no', passport_issue_date='$pp_i_d_strd', passport_expiry_date='$pp_ex_d_strd', place_of_issue='$place_of_issue', agency='$agency', country='$country', profession='$profession', fee_charged='$fee_charged', candidate_name='$candidate_name', cnic='$cnic', son_of='$son_of', nationality='$nationality', d_o_b='$d_o_b_strd', phone_1='$phone_1', phone_2='$phone_2', gender='$gender', marital_status='$marital_status', remarks='$remarks',serial_no='$serial_new',candidate_img='$candidate_img',reg_date='$new_reg_date',slip_issue_date='$slip_issue_date',slip_expiry_date='$slip_expiry_date' where reg_id='$regid'");
 
       } else {
 
-          $run_Query = $data->query("update tb_registration set passport_no='$passport_no', passport_issue_date='$pp_i_d_strd', passport_expiry_date='$pp_ex_d_strd', place_of_issue='$place_of_issue', agency='$agency', country='$country', profession='$profession', fee_charged='$fee_charged', candidate_name='$candidate_name', cnic='$cnic', son_of='$son_of', nationality='$nationality', d_o_b='$d_o_b_strd', phone_1='$phone_1', phone_2='$phone_2', gender='$gender', marital_status='$marital_status', remarks='$remarks',serial_no='$serial_new' where reg_id='$regid'");
+          $run_Query = $data->query("update tb_registration set passport_no='$passport_no', passport_issue_date='$pp_i_d_strd', passport_expiry_date='$pp_ex_d_strd', place_of_issue='$place_of_issue', agency='$agency', country='$country', profession='$profession', fee_charged='$fee_charged', candidate_name='$candidate_name', cnic='$cnic', son_of='$son_of', nationality='$nationality', d_o_b='$d_o_b_strd', phone_1='$phone_1', phone_2='$phone_2', gender='$gender', marital_status='$marital_status', remarks='$remarks',serial_no='$serial_new',reg_date='$new_reg_date',slip_issue_date='$slip_issue_date',slip_expiry_date='$slip_expiry_date' where reg_id='$regid'");
 
       }
   
-      if($run_Query)
-        echo show_message(1,"Record Updated");
-      else
-        echo show_message(0,"Update Fail, Try Again Later");
+      if($run_Query){
+      ?>
+        <script>
+          document.getElementById('successClass').style.display = "block";
+        </script>
+      <?php
+      }
+      else{
+      ?>
+        <script>
+          document.getElementById('failClass').style.display = "block";
+        </script>
+      <?php
+      }
     }
 
     if(isset($_POST['update_and_print'])) {
@@ -5116,14 +5706,18 @@ function edit_registered_candidate()
       $serial_new = $_POST['serial_new'];
       $bar = $_POST['barcode'];
       $candidate_img = $_POST['img_name'];
+      $slip_issue_date = $_POST['slip_issue_date'];
+      $slip_expiry_date = $_POST['slip_expiry_date'];
+      $myDateTime = DateTime::createFromFormat('d/m/Y', $_POST['reg_date']);
+      $new_reg_date = $myDateTime->format('Y-m-d');
 
       if($candidate_img) {
 
-          $run_Query = $data->query("update tb_registration set passport_no='$passport_no', passport_issue_date='$pp_i_d_strd', passport_expiry_date='$pp_ex_d_strd', place_of_issue='$place_of_issue', agency='$agency', country='$country', profession='$profession', fee_charged='$fee_charged', candidate_name='$candidate_name', cnic='$cnic', son_of='$son_of', nationality='$nationality', d_o_b='$d_o_b_strd', phone_1='$phone_1', phone_2='$phone_2', gender='$gender', marital_status='$marital_status', remarks='$remarks',serial_no='$serial_new',candidate_img='$candidate_img' where reg_id='$regid'");
+          $run_Query = $data->query("update tb_registration set passport_no='$passport_no', passport_issue_date='$pp_i_d_strd', passport_expiry_date='$pp_ex_d_strd', place_of_issue='$place_of_issue', agency='$agency', country='$country', profession='$profession', fee_charged='$fee_charged', candidate_name='$candidate_name', cnic='$cnic', son_of='$son_of', nationality='$nationality', d_o_b='$d_o_b_strd', phone_1='$phone_1', phone_2='$phone_2', gender='$gender', marital_status='$marital_status', remarks='$remarks',serial_no='$serial_new',candidate_img='$candidate_img',reg_date='$new_reg_date',slip_issue_date='$slip_issue_date',slip_expiry_date='$slip_expiry_date' where reg_id='$regid'");
 
       } else {
 
-          $run_Query = $data->query("update tb_registration set passport_no='$passport_no', passport_issue_date='$pp_i_d_strd', passport_expiry_date='$pp_ex_d_strd', place_of_issue='$place_of_issue', agency='$agency', country='$country', profession='$profession', fee_charged='$fee_charged', candidate_name='$candidate_name', cnic='$cnic', son_of='$son_of', nationality='$nationality', d_o_b='$d_o_b_strd', phone_1='$phone_1', phone_2='$phone_2', gender='$gender', marital_status='$marital_status', remarks='$remarks',serial_no='$serial_new' where reg_id='$regid'");
+          $run_Query = $data->query("update tb_registration set passport_no='$passport_no', passport_issue_date='$pp_i_d_strd', passport_expiry_date='$pp_ex_d_strd', place_of_issue='$place_of_issue', agency='$agency', country='$country', profession='$profession', fee_charged='$fee_charged', candidate_name='$candidate_name', cnic='$cnic', son_of='$son_of', nationality='$nationality', d_o_b='$d_o_b_strd', phone_1='$phone_1', phone_2='$phone_2', gender='$gender', marital_status='$marital_status', remarks='$remarks',serial_no='$serial_new',reg_date='$new_reg_date',slip_issue_date='$slip_issue_date',slip_expiry_date='$slip_expiry_date' where reg_id='$regid'");
 
       }
   
@@ -5134,7 +5728,11 @@ function edit_registered_candidate()
       }
             
       else{
-        echo show_message(0,"Update Fail, Try Again Later");
+      ?>
+        <script>
+          document.getElementById('failClass').style.display = "block";
+        </script>
+      <?php
       }
         
       }
@@ -6097,20 +6695,135 @@ function edit_xray_info()
     $xray_notes = $_POST['xray_notes'];
     $reg_id = $_POST['reg_id'];
 
-    $run_Query = $data->query("update tb_xray_result set xray_date='$xray_date',xray_chest='$xray_chest',xray_notes='$xray_notes' where reg_id='$reg_id'");
+    if($xray_chest == 'unfit due to x-ray findings')
+    {
+        $xray_status = 'UNFIT';
+    }
+    elseif($xray_chest == 'repeat') 
+    {
+        $xray_status = 'In Process';
+    }
+    else 
+    {
+        $xray_status = 'FIT';
+    }
 
-      if($run_Query) {
-        // echo show_message(1,"Record Updated!");
-        echo "<script>alert('Record Updated!')</script>";
+      if(isset($_FILES['xray_file'])) {
 
-        update_medical_status_final($reg_id);
-        
-        redirect("edit_xray", "_self");
+        alert_box("File!");
+
+          $target_dir = "assets/candidate_xray/";
+          $target_file = $target_dir . basename($_FILES["xray_file"]["name"]);
+          $uploadOk = 1;
+          $imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
+          // Check if image file is a actual image or fake image
+
+              $check = getimagesize($_FILES["xray_file"]["tmp_name"]);
+              if($check != false) {
+                  // echo "File is an image - " . $check["mime"] . ".";
+                  $uploadOk = 1;
+              } else {
+                  alert_box("File is not an image.");
+                  $uploadOk = 0;
+              }
+          
+          // Check if file already exists
+          if (file_exists($target_file)) {
+              // echo "Sorry, file already exists.";
+              alert_box("Sorry, file already exists.");
+              redirect('edit_xray','_self');
+              $uploadOk = 0;
+          }
+          // Check file size
+          if ($_FILES["xray_file"]["size"] > 500000) {
+              alert_box("Sorry, your file is too large.");
+              $uploadOk = 0;
+          }
+          // Allow certain file formats
+          if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
+          && $imageFileType != "gif" ) {
+              // echo "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
+              alert_box("Sorry, only JPG, JPEG, PNG & GIF files are allowed.");
+              redirect('edit_xray','_self');
+              $uploadOk = 0;
+          }
+          // Check if $uploadOk is set to 0 by an error
+          if ($uploadOk == 0) {
+              // echo "Sorry, your file was not uploaded.";
+              alert_box("Sorry, your file was not uploaded.");
+              redirect('edit_xray','_self');
+          // if everything is ok, try to upload file
+          } 
+          else {
+              $file_name=$_FILES["xray_file"]["name"];
+              $file_tmp=$_FILES["xray_file"]["tmp_name"];
+              $ext=pathinfo($file_name,PATHINFO_EXTENSION);
+              $filePath = "assets/candidate_xray/".$file_name;
+              $imgname=basename($file_name,$ext);
+              $newFileName=$imgname.time().".".$ext;
+              $newfilePath="assets/candidate_xray/".$newFileName;
+              if(move_uploaded_file($file_tmp=$_FILES["xray_file"]["tmp_name"],$newfilePath)) {
+
+                $run_Query = $data->query("update tb_xray_result set xray_date='$xray_date',xray_chest='$xray_chest',xray_status='$xray_status',xray_notes='$xray_notes' where reg_id='$reg_id'");
+
+                  $record_exist = $data->query("select reg_id from tb_xray_slips where reg_id='$reg_id'");
+                  $count_rows = mysqli_num_rows($record_exist);
+                  if($count_rows > 0) {
+
+                    alert_box("Reord Found");
+                    $run_Query2 = $data->query("update tb_xray_slips set xray_slips='$newFileName',updated_at='$today_date_with_time' where reg_id='$reg_id'");
+
+                    if($run_Query2) {
+
+                      // echo show_message(1,"Record Updated!");
+                      alert_box("Record Updated!");
+
+                      update_medical_status_final($reg_id);
+                      
+                      redirect("edit_xray", "_self");
+                    }
+                    else
+                      echo show_message(0,"Update Fail, Try Again Later");
+
+                  } else {
+
+                    $insert_xray_slip = array(
+                        'reg_id' => mysqli_real_escape_string($data->con, $reg_id),
+                        'xray_slips' => mysqli_real_escape_string($data->con, $newfilePath)
+                    );
+                    
+                    if($data->insert('tb_xray_slips', $insert_xray_slip)) {
+
+                      alert_box("Record Updated!");
+
+                      update_medical_status_final($reg_id);
+                      
+                      redirect("edit_xray", "_self");
+                    }
+
+                  }
+
+              }              
+              
+            }
+
+          }
+          else{
+            
+            $run_Query = $data->query("update tb_xray_result set xray_date='$xray_date',xray_chest='$xray_chest',xray_status='$xray_status',xray_notes='$xray_notes' where reg_id='$reg_id'");
+
+            if($run_Query) {
+              // echo show_message(1,"Record Updated!");
+              alert_box("Record Updated!");
+
+              update_medical_status_final($reg_id);
+              
+              redirect("edit_xray", "_self");
+            }
+            else
+              echo show_message(0,"Update Fail, Try Again Later");
+          }
       }
-      else
-        echo show_message(0,"Update Fail, Try Again Later");
-
-  }
 }
 
 function get_cand_report() 
@@ -6175,7 +6888,7 @@ function eno_history()
 {    
     global $data;
                 
-    $process_query = $data->query("select r.reg_date, r.serial_no, r.candidate_name, e.screenshot, e.passport_no, e.eno, e.eno_date from tb_eno e, tb_registration r where e.passport_no=r.passport_no LIMIT 0,49");
+    $process_query = $data->query("select r.reg_date, r.serial_no, r.candidate_name, e.screenshot, e.passport_no, e.eno, e.eno_date from tb_eno e, tb_registration r where e.passport_no=r.passport_no");
     while ($rows = mysqli_fetch_array($process_query)) {
       $reg_date = $rows['reg_date'];
       $serial_no = $rows['serial_no'];
@@ -6704,7 +7417,7 @@ function daily_status_history()
 {    
     global $data;
                 
-        $process_query = $data->query("select passport_no, candidate_name, son_of, country, agency, serial_no, reg_date, print_report_portion, medical_status from tb_registration LIMIT 0,49");
+        $process_query = $data->query("select passport_no, candidate_name, son_of, country, agency, serial_no, reg_date, print_report_portion, medical_status from tb_registration");
         while ($rows = mysqli_fetch_array($process_query)) {
           $REG_DATE = $rows['reg_date'];
           $Reg_date=date("d-m-Y",strtotime($REG_DATE));
@@ -7370,6 +8083,7 @@ function fill_xray_result()
   global $xray_notes;
   global $reg_id;
   global $xray_date;
+  global $xray_image;
 
   if (isset($_GET['e_xray_chest']) || (isset($_GET['e_xray_date']))) {
 
@@ -7378,6 +8092,7 @@ function fill_xray_result()
     $xray_notesDecode = $_GET['e_xray_notes'];
     $reg_idDecode = $_GET['e_reg_id'];
     $xray_date = $_GET['e_xray_date'];
+    $xray_image = $_GET['e_xray_image'];
     
     $xray_chest = base64_decode($xray_chestDecode);
     $xray_notes = base64_decode($xray_notesDecode);
@@ -7418,7 +8133,11 @@ function upload_xray_result() {
             $reg_arr = mysqli_fetch_array($record_check);
             $regId = $reg_arr['reg_id'];
             
-            $previous_records = $data->query("SELECT * FROM `tb_xray_result` WHERE `reg_id`='$regId'");
+            $previous_records = $data->query("SELECT xr.xray_id,xr.reg_id,xr.xray_chest,xr.xray_notes,xr.xray_date,xr.xray_status                               ,xr.created_on,xr.xray_status,xs.xray_slips 
+                                              FROM tb_xray_result xr
+                                              LEFT JOIN tb_xray_slips xs ON xs.reg_id=xr.reg_id
+                                              WHERE xr.reg_id='$regId'");
+
             $check_rows = mysqli_num_rows($previous_records);
 
             if($check_rows > 0) {
@@ -7441,6 +8160,7 @@ function upload_xray_result() {
                     <th>Xray Chest</th>
                     <th>Xray Notes</th>
                     <th>Xray Date</th>
+                    <th>Xray Image</th>
                     <th>Created On</th>
                     <th>Xray Status</th>
                     <th>Action</th>
@@ -7457,6 +8177,7 @@ function upload_xray_result() {
                 $xray_date = $row_data['xray_date'];
                 $created_on = $row_data['created_on'];
                 $xray_status = $row_data['xray_status'];
+                $xray_slips = $row_data['xray_slips'];
 
                 $xray_chestEncoded = base64_encode($xray_chest);
                 $xray_notesEncoded = base64_encode($xray_notes);
@@ -7468,10 +8189,22 @@ function upload_xray_result() {
                        echo "<td>$xray_chest</td>";
                        echo "<td>$xray_notes</td>";
                        echo "<td>$xray_date</td>";
+                       if($xray_slips!='') {
+                          echo "<td>
+                                  <div class='avatar-group'>
+                                    <a href='candidate_xray/$xray_slips' target='_blank' class='avatar avatar-sm rounded-circle' data-toggle='tooltip' data-original-title='View'>
+                                      <img alt='Image placeholder' src='candidate_xray/$xray_slips'>
+                                    </a>
+                                  </div>
+                                </td>";
+                       }
+                       else{
+                          echo "<td></td>";
+                       }
                        echo "<td>$created_on</td>";
                        echo "<td>$xray_status</td>";
                        if($loginuser==19) {
-                          echo "<td><a href=edit_xray?e_xray_chest=$xray_chestEncoded&&e_xray_notes=$xray_notesEncoded&&e_reg_id=$reg_idEncoded&&e_xray_date=$xray_date target=_blank class='table-action' data-toggle='tooltip' data-original-title='Edit Xray'>";
+                          echo "<td><a href=edit_xray?e_xray_chest=$xray_chestEncoded&&e_xray_notes=$xray_notesEncoded&&e_reg_id=$reg_idEncoded&&e_xray_date=$xray_date&&e_xray_image=$xray_slips target=_blank class='table-action' data-toggle='tooltip' data-original-title='Edit Xray'>";
                           echo "<i class='fas fa-user-edit'></i>";
                           echo "</a></td>";
                        } else {
@@ -7503,101 +8236,107 @@ function upload_xray_result() {
 }
 
 
-// function upload_xray_result() {
+function candidate_details() {
 
-//   global $data;
+  global $data;
 
-//   if(isset($_POST["cand_xray"])) {
+  if(isset($_POST["candidate_detail"])) {
 
-//     $serial = $_POST['serial2'];
-//     $xd=$_POST['xraydate2'];
+    $passport_no = $_POST['passport_no'];
 
-//       $exp_date = $_POST['xraydate2'];
-//       $exp_dat = str_replace('/', '-', $exp_date);
-//       $xray_date = date("Y-m-d",strtotime($exp_dat));
-//       $loginuser = $_POST['loginid'];
-//       $center_id = $_POST['center_id'];
-
-
-//         $record_check = $data->query("SELECT xr.reg_id FROM `tb_xray_result` xr 
-//                                         INNER JOIN tb_registration reg ON reg.reg_id = xr.reg_id
-//                                         WHERE reg.serial_no='$serial' AND reg.reg_date='$xray_date'");
-//         $count_rows = mysqli_num_rows($record_check);
-//             if($count_rows==0) {
-//                 echo "<script>alert('No Record Found')</script>";
-//                 echo "<script>window.open('xray_result','_self')</script>";
-//             }
-//             else {
-
-//             $reg_arr = mysqli_fetch_array($record_check);
-//             $regId = $reg_arr['reg_id'];
+      $record_check = $data->query("SELECT candidate_img FROM tb_registration
+                                    WHERE passport_no='$passport_no' AND country!='CASE CANCELLED'");
+      $count_rows = mysqli_num_rows($record_check);
+          if($count_rows==0) {
             
-//             $previous_records = $data->query("SELECT * FROM `tb_xray_result` WHERE `reg_id`='$regId'");
-//             $check_rows = mysqli_num_rows($previous_records);
+            ?>
+              <script type="text/javascript">
+                document.getElementById("danger").style.display = 'block';
+              </script>
+            <?php
+        
+          }
+          else {
 
-//             if($check_rows > 0) {
-//               echo show_message(1, "Record already exist!");
-//               echo '<div class="modal fade" id="modal-default" tabindex="-1" role="dialog">
-//       <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
-//         <div class="modal-content">
-//           <div class="modal-header">
-//             <h6 class="modal-title" id="modal-title-default">Candidate Previous Record</h6>
-//             <button type="button" class="btn btn-link  ml-auto" id="closeModal" onclick="closeModal()" data-dismiss="modal">Close</button>
-//           </div>
-//           <div class="modal-body">
-//             <div class="table-responsive py-2">
-//               <table class="table table-flush">
-//                 <thead class="thead-light">
-//                   <tr>
-//                     <th>S#</th>
-//                     <th>Xray Chest</th>
-//                     <th>Xray Notes</th>
-//                     <th>Xray Date</th>
-//                     <th>Created On</th>
-//                     <th>Xray Status</th>
-//                   </tr>
-//                 </thead>
-//                 <tbody>';
-          
-//             $i = 1;
-//             while ($row_data = mysqli_fetch_array($previous_records)) {
-                
-//                 $xray_chest = $row_data['xray_chest'];
-//                 $xray_notes = $row_data['xray_notes'];
-//                 $xray_date = $row_data['xray_date'];
-//                 // $process_name = "Xray Result";
-//                 $created_on = $row_data['created_on'];
-//                 $xray_status = $row_data['xray_status'];
+            
 
-//                 // echo '<script>alert("Previous record found!")</script>';
-//                 echo "<tr>";                
-//                        echo "<td>$i</td>";
-//                        echo "<td>$xray_chest</td>";
-//                        echo "<td>$xray_notes</td>";
-//                        echo "<td>$xray_date</td>";
-//                        echo "<td>$created_on</td>";
-//                        echo "<td>$xray_status</td>";
-//                       echo "</tr>";
-                
-//                $i++;           
-//               }
+            $reg_arr = mysqli_fetch_array($record_check);
+            $candidate_img = $reg_arr['candidate_img'];
 
-//             echo '</tbody>
-//                   </table>
-//                   </div>
-//                   </div>
-//                 </div>
-//               </div>';
-//             echo "</div><script>$(document).ready(function() { $('#modal-default').modal('show'); });</script>";
+            if($candidate_img!='') {
 
-//            }
-      
-//       }
+              ?>
+                <script type="text/javascript">
+                  document.getElementById("success").style.display = 'block';
+                </script>
+              <?php
+
+              echo "<div class='col-lg-8'>
+                      <div class='card-wrapper'>
+                        <div class='card'>
+                          <div class='card-header'>
+                            <h3 class='mb-0'>Candidate Images</h3>
+                          </div>
+                          <div class='card-body'>
+                            <form method='post' action=''>
+                              <div class='row'>
+                                <div class='col-md-6'>
+                                  <div class='form-group'>
+                                  <a href='assets/candidate_image/$candidate_img' target='_blank' data-toggle='tooltip' data-original-title='Click to View'>
+                                    <label class='form-control-label' for='exampleDatepicker'>Candidate Image</label>
+                                    <img src='assets/candidate_image/$candidate_img' id='cand_img' alt='...'' class='img-thumbnail'>
+                                  </a>
+                                  </div>
+                                </div>
+                                
+                              </div>
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+                    </div>";
+            }
+            else {
+
+                ?>
+                  <script type="text/javascript">
+                    document.getElementById("warning").style.display = 'block';
+                  </script>
+                <?php
+
+            }
+    
+          }
 
     
-//   }
+  }
 
-// }
+}
+
+function update_zeroId_lab_result() {
+  // 23/02/2021 by noman:
+  global $data;
+
+  $get_results = $data->query("SELECT DISTINCT `reg_id`,`sticker_value_2` FROM `tb_lab_sticker` WHERE `sticker_value_2` != '' AND reg_date >= '2021-01-01'");
+
+  $get_results_2 = $data->query("SELECT * FROM `tb_lab_result` WHERE `barcode` LIKE 'r18 - 2021-02-08' ORDER BY `lab_result_id` DESC");
+
+    while($row=mysqli_fetch_array($get_results)) {
+      $l_count=0;
+      $reg_id = $row['reg_id'];
+      $sticker_value_2 = $row['sticker_value_2'];
+
+      $get_results_2 = $data->query("SELECT * FROM `tb_lab_result` WHERE `barcode` LIKE '$sticker_value_2' AND `reg_id` = 0");
+        $l_count = mysqli_num_rows($get_results_2);
+        if($l_count > 0) {
+          $get_results_2 = $data->query("UPDATE `tb_lab_result` SET `reg_id`='$reg_id' WHERE `barcode` LIKE '$sticker_value_2'");
+          echo "updated...";
+        }
+ 
+    }
+
+
+}
 
 
 ?>

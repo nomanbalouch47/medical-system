@@ -51,12 +51,25 @@ include_once('include/head.php');
             </div>
 
             <div class="col-lg-6 col-5 text-right">
+                
+              <select id="country" onchange="show_pregnancy();" >
+                <option value="">- Select token -</option>
+                  <?php
+                  $country = $data->query("select token_no from tb_tokens ");
+                  while ($rows=mysqli_fetch_array($country)) {
+                    $country_name = $rows['Name'];
+                    echo "<option value='$country_name'>$country_name</option>";
+                  
+                  }
+                  ?>
+              </select>        
               <h6 class="h2 text-white d-inline-block mb-0">Now serving: <?php echo $token_prefix.$current_token = get_current_token(); ?>  | In Queue <?php echo tokens_in_queue($process_id); ?> </h6> &nbsp;
               
               <input type="hidden" name="token_number" id="token_number" value="<?php echo $current_token; ?>">
               <input type="hidden" name="processid" value="<?php echo $process_id; ?>">
-              
+              <input type="hidden" id="counter" name="counter">
               <input type="submit" name="call_token" class="btn btn-sm btn-neutral" value="New">
+
             </div>
           </div>
         </div>
@@ -182,7 +195,7 @@ include_once('include/head.php');
                     <div class="col-md-6">
                       <div class="form-group">                        
                           <label class="form-control-label" for="exampleDatepicker">Date</label>
-                          <input class="form-control" type="text" id="regdate" value="<?php echo $today_date_for_datepicker; ?>">
+                          <input class="form-control" type="text" id="regdate" value="<?php echo $today_date_for_datepicker; ?>" placeholder="dd/mm/yyyy" required>
                           <span class="calendar-grid-58"></span>
                       
                       </div>
@@ -259,13 +272,13 @@ include_once('include/head.php');
                        <div class="col-md-3">
                       <div class="form-group">
                             <label class="form-control-label" for="exampleDatepicker">Fees Charged</label>
-                            <input class="form-control" placeholder="Fees" id="fees" type="text">
+                            <input class="form-control" placeholder="Fees" id="fees" type="number" required>
                       </div>
                     </div>
                     <div class="col-md-3">
                       <div class="form-group">
                             <label class="form-control-label" for="exampleDatepicker">Discount</label>
-                            <input class="form-control" placeholder="Discount" id="disc" type="text">
+                            <input class="form-control" placeholder="Discount" id="disc" type="number">
                       </div>
                     </div>
                   </div>
@@ -306,8 +319,23 @@ include_once('include/head.php');
                         <span style="float: right;">
                           <label>Select Counter</label>
                         <select name="counter_no" id="counter_no" class="form-control">
-                          <option value="1">Counter 1</option>
-                          <option value="2">Counter 2</option>
+                          <?php
+                            if($loginuser==19) {
+                          ?>
+                              <option value="1">Counter 1</option>
+                              <option value="2">Counter 2</option>
+                              <option value="3">Counter 3</option>
+                          <?php  
+                            } 
+                            else {
+                              $place = $data->query("select counter_no from user_action_rights where user_id='$loginuser' and module_id='$process_id'");
+                              while ($rows=mysqli_fetch_array($place)) {
+                                $counter_no = $rows['counter_no'];
+                                if($counter_no!='0')
+                                  echo "<option value='$counter_no' selected=selected>Counter $counter_no</option>";
+                              }
+                            }
+                          ?>
                         </select>
                         </span>
 
@@ -365,7 +393,7 @@ include_once('include/head.php');
                     <div class='col-md-4'>
                       <div class='form-group'>
                         <label class='form-control-label'>PP Issue Date</label>
-                        <input class='form-control' type='datetime' placeholder='mm/dd/yyyy' id='ppissuedate' onkeyup='candidate_already_check(event)'>                       
+                        <input class='form-control' type='datetime' placeholder='dd/mm/yyyy' id='ppissuedate' onkeyup='candidate_already_check(event)'>                       
                       </div>
                     </div>
 
@@ -535,8 +563,16 @@ include('include/footer.php');
 
 <!-- passport import area -->
 <script>
+$(document).ready(function(){
   var counterNum = document.getElementById('counter_no').value;
+  document.getElementById("counter").value = counterNum;
+});
+// function counterSelect() {
+//   var counterNum = document.getElementById('counter_no').value;
+//   document.getElementById("counter").value = counterNum;
+// }
 
+  var counterNum = document.getElementById('counter_no').value;
   $(document).ready(function(){
 
     $(".getppinfo").click(function(){
@@ -671,12 +707,22 @@ document.getElementById("snap").addEventListener("click", function() {
 
 
 $(function() { 
+
+  
             $("#geeks").click(function() { 
+
+              
+              
+              if(document.getElementById('passport')) {
+
                 html2canvas($("#canvas"), { 
                     onrendered: function(canvas) { 
                         var imgsrc = canvas.toDataURL("image/png"); 
                         //console.log(imgsrc); 
                         $("#newimg").attr('src', imgsrc); 
+                        
+                        var passport = document.getElementById('passport').value;
+
                         //$("#img").show(); 
                         var dataURL = canvas.toDataURL(); 
                         $.ajax({ 
@@ -684,7 +730,8 @@ $(function() {
                             url: '././include/functions.php',
                             data: { 
                                 form_name : form_name,
-                                imgBase64: dataURL 
+                                imgBase64: dataURL,
+                                passport: passport 
                             } 
                         }).done(function(data) {
                             $('#img_result').html(data); 
@@ -692,7 +739,12 @@ $(function() {
                         }); 
                     } 
                 }); 
-            }); 
+                }
+            else {
+                alert("To Save Candidate Image, Import Passport Info First!");
+            } 
+            });
+            
         }); 
 //camera script end
 

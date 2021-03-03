@@ -1,6 +1,16 @@
 <?php
 error_reporting(0);
-include('include/functions.php'); ?>
+include('include/functions.php'); 
+
+if(isset($_SESSION['user_login']) == ""){
+
+  alert_box("Please Login to continue");
+  redirect('login','_self');
+}else{
+  $loginuser = $_SESSION['user_login']['user_id'];
+  auth_user($loginuser,22);
+}
+?>
 <!DOCTYPE html>
 <html>
 <?php

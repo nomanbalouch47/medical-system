@@ -17,7 +17,7 @@ include_once('include/head.php');
 ?>
 <style type="text/css">
   
-  #errorclass,#barcodeError,#alreadyexistError,#polio_date,#meningco_date,#mmr2_date,#mmr1_date
+  #errorclass,#barcodeError,#alreadyexistError,#polio_date,#meningco_date,#mmr2_date,#mmr1_date,#barcodeSuccess
   {
   display:none;
   }
@@ -74,6 +74,13 @@ include_once('include/head.php');
 
           <div class="alert alert-danger alert-dismissible fade show col-md-offset-2" id="alreadyexistError" role="alert">   
         <span class="alert-text"><strong>Warning!</strong> Result Already Uploaded! </span>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <div class="alert alert-success alert-dismissible fade show col-md-offset-2" id="barcodeSuccess" role="alert">   
+        <span class="alert-text"><strong>Success!</strong> Candidate Verified!</span>
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -616,8 +623,11 @@ include_once('include/head.php');
 
                   <div class="col-md-12">
                     <div class="form-group">
-                      <h3 class="mb-0">Kindly Check all the fields before <strong>update</strong> </h3><br>  
-                       <input type="button" name="lab_result_form" id="lab_result_form" class="btn btn-danger" value="Update Result" onclick="lab_result();">
+                      <h3 class="mb-0">Kindly Check all the fields before <strong>&ensp; Save Result</strong> </h3><br>  
+                      <button name="lab_result_form" id="lab_result_form" class="btn btn-icon btn-primary my-2" onclick="lab_result();" type="button">
+                        <span class="btn-inner--icon"><i class="ni ni-check-bold"></i></span>
+                        <span class="btn-inner--text">Save Result</span>
+                      </button>
                     </div>
                   </div>
                   <p id="respond_lab_result"></p>

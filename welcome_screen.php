@@ -1,4 +1,13 @@
-<?php include('include/functions.php'); ?>
+<?php include('include/functions.php'); 
+if(isset($_SESSION['user_login']) == ""){
+
+  alert_box("Please Login to continue");
+  redirect('login','_self');
+}else{
+  $loginuser = $_SESSION['user_login']['user_id'];
+  auth_user($loginuser,1);
+}
+?>
 <!DOCTYPE html>
 <html>
 <?php
@@ -56,6 +65,7 @@ include_once('include/head.php');
               <div class="text-center mb-10">
                 <h3 class="display-3" >Now Serving</h3>
                 <h1 class="display-1"  style="font-size: 150px;" id="token_num"></h1>
+                <input type="hidden" name="counter" id="counter">
               </div>
              
             </div>

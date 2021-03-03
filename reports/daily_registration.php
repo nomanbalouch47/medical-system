@@ -8,6 +8,8 @@ if(isset($_POST['generate_report'])){
   $reg_date = $_POST['reg_date'];
   $country_arr = $_POST['countries'];
 
+  // print_r($country_arr);
+
   $search_date = date("d-m-Y",strtotime($_POST['reg_date']));
 
   $process_query = get_daily_report_pdf($reg_date,$country_arr);

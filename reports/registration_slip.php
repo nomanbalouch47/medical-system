@@ -12,7 +12,20 @@ if (isset($_GET['barcode'])) {
 
 $process_query = get_medical_lab_report_pdf($barcode_num);
   //print_r($process_query2);
+    $query_result=mysqli_fetch_array($process_query);
+      $serial_no = $query_result['serial_no'];
+      $cand_name = $query_result['candidate_name'];
+      $country = $query_result['country'];
+      $phone_1 = $query_result['phone_1'];
+      $pp_no = $query_result['passport_no'];
+      $reg_date = $query_result['reg_date'];
+      $time = $query_result['created_at'];
+      $barc = $query_result['barcode_no'];
+      $token_no = $query_result['token_no'];
+      $profession = $query_result['profession'];
 
+      $cand_nameUpper = strtoupper($cand_name);
+      $countryUpper = strtoupper($country);
 
 
 class PDF extends PDF_Code128
@@ -22,6 +35,9 @@ class PDF extends PDF_Code128
 
 function Header()
 {
+    global $reg_date;
+
+    $exam_date=date("d-m-Y",strtotime($reg_date));
     $today_date = date("d-m-Y");
     $image1="../assets/img/comp_logo/reliance_logo.png";
 
@@ -36,17 +52,17 @@ function Header()
 
     // Title
     $this->SetFont('Arial','',11);
-    //$this->Image($image1,10,10,15);
+    // $this->Image($image1,10,10,15);
     $this->Ln(18);
-    //$this->Cell(0,20,$this->Image($image1,$this->GetX(),$this->GetY(),109.78),0,1,'R',false);
+    // $this->Cell(0,20,$this->Image($image1,$this->GetX(),$this->GetY(),109.78),0,1,'R',false);
 
-    $this->SetX(70); //The next cell will be set 100 units to the right
+    $this->SetX(70); // The next cell will be set 100 units to the right
     $this->Cell(40,0,$this->Image($image1,$this->GetX(),$this->GetY(),70,20),0,0,'C',false);
-    //$this->Cell(70,0,$this->Image($image1),0,0,'C',true);
+    // $this->Cell(70,0,$this->Image($image1),0,0,'C',true);
     $this->Ln(20);
     $this->Ln(20);
 
-    //$this->Cell(149,5,'G.H.C. Code 02/02/07',0,1,'R');
+    // $this->Cell(149,5,'G.H.C. Code 02/02/07',0,1,'R');
     $this->SetFont('Arial','U',14);
     $this->Cell(0,6,$address,0,1,'C');
     $this->Cell(0,6,'Phone: '.$phone_no.', '.$phone_no_2.', Fax: '.$fax_no.'',0,1,'C');
@@ -55,8 +71,9 @@ function Header()
 
         /*$this->SetFont('Arial','',11);
         $this->Cell(0,5,'Date examined: '.$today_date.'',0,1,'R');*/
-    
-
+    $this->SetFont('Arial','B',14);
+    $this->SetX(20);
+    $this->Cell(60,1,'Date:'.$exam_date,0,0,'C');
     // horizontal line
       $this->Ln(2);
       $this->Line(30, 95, 180, 95);
@@ -75,28 +92,39 @@ function Body()
     global $phone_1;
 
     
-    $this->SetFont('Arial','',11);
-    //$this->Cell(169,7,'CANDIDATE INFORMATION',1,1,'C');
-    //$this->Cell(40,7,$this->Image($image1,$this->GetX(),$this->GetY(),30.78,42.78),0,1,'L',false);
-    //$this->SetFont('Arial','',9);
+    $this->SetFont('Arial','B',11);
+    // $this->Cell(169,7,'CANDIDATE INFORMATION',1,1,'C');
+    // $this->Cell(40,7,$this->Image($image1,$this->GetX(),$this->GetY(),30.78,42.78),0,1,'L',false);
+    // $this->SetFont('Arial','',9);
     $this->SetX(15);
     $this->Cell(60,7,'Candidate Name',1,0,'L');
-    $this->Cell(120,7,$cand_nameUpper,1,1,'L');
+    $this->SetFont('Arial','',11);
+    $this->Cell(120,7,' '.$cand_nameUpper,1,1,'L');
     $this->SetX(15);
+    $this->SetFont('Arial','B',11);
     $this->Cell(60,7,'Passport Number',1,0,'L');
-    $this->Cell(120,7,$pp_no,1,1,'L');
+    $this->SetFont('Arial','',11);
+    $this->Cell(120,7,' '.$pp_no,1,1,'L');
     $this->SetX(15);
+    $this->SetFont('Arial','B',11);
     $this->Cell(60,7,'Country',1,0,'L');
-    $this->Cell(120,7,$countryUpper,1,1,'L');
+    $this->SetFont('Arial','',11);
+    $this->Cell(120,7,' '.$countryUpper,1,1,'L');
     $this->SetX(15);
+    $this->SetFont('Arial','B',11);
     $this->Cell(60,7,'Mobile Number',1,0,'L');
-    $this->Cell(120,7,$phone_1,1,1,'L');
+    $this->SetFont('Arial','',11);
+    $this->Cell(120,7,' '.$phone_1,1,1,'L');
     $this->SetX(15);
+    $this->SetFont('Arial','B',11);
     $this->Cell(60,7,'Reporting Date',1,0,'L');
-    $this->Cell(120,7,'After 2 Working Days',1,1,'L');
+    $this->SetFont('Arial','',11);
+    $this->Cell(120,7,' '.'',1,1,'L');
     $this->SetX(15);
+    $this->SetFont('Arial','B',11);
     $this->Cell(60,7,'Reporting Time',1,0,'L');
-    $this->Cell(120,7,'3.00 PM',1,1,'L');   
+    $this->SetFont('Arial','',11);
+    $this->Cell(120,7,' '.'3.00 PM',1,1,'L');   
 
     $this->Ln(6);
 }
@@ -107,9 +135,11 @@ function Footer()
     global $cand_nameUpper;
     global $countryUpper;
     global $pp_no;
+    global $exam_date;
     global $reg_date;
     global $barc;
     global $token_no;
+    global $profession;
     $exam_date=date("d-m-Y",strtotime($reg_date));
     $image1="../assets/img/bar-code.jpg";
     $code=$barc;
@@ -134,7 +164,7 @@ function Footer()
         $this->Ln(21);
         //$this->SetX(190);
         //$this->SetXY(50,145);
-        $this->SetX(110);
+        // $this->SetX(110);
         $this->SetX(130);
         $this->SetFont('Arial','',14);
         $this->Write(5,''.$code.'');
@@ -144,29 +174,43 @@ function Footer()
         // $this->SetY(190);
 
         $this->SetX(15);
-        $this->Ln(16);
+        $this->Ln(14);
         $this->Cell(4,10,"........................................................................................................................................", 0, 1);
-        $this->Ln(20);
+        $this->Ln(12);
         $this->SetFont('Arial','',10);
         $this->Cell(12,7,$token_no,0,1,'R');
 
-        $this->SetFont('Arial','',14);
         
         $this->SetX(15);
+        $this->SetFont('Arial','B',13);
         $this->Cell(60,7,'Candidate Name',1,0,'L');
-        $this->Cell(120,7,$cand_nameUpper,1,1,'L');
+        $this->SetFont('Arial','',13);
+        $this->Cell(120,7,' '.$cand_nameUpper,1,1,'L');
         $this->SetX(15);
+        $this->SetFont('Arial','B',13);
         $this->Cell(60,7,'Passport Number',1,0,'L');
-        $this->Cell(120,7,$pp_no,1,1,'L');
+        $this->SetFont('Arial','',13);
+        $this->Cell(120,7,' '.$pp_no,1,1,'L');
         $this->SetX(15);
+        $this->SetFont('Arial','B',13);
         $this->Cell(60,7,'Country',1,0,'L');
-        $this->Cell(120,7,$countryUpper,1,1,'L');
+        $this->SetFont('Arial','',13);
+        $this->Cell(120,7,' '.$countryUpper,1,1,'L');
         $this->SetX(15);
+        $this->SetFont('Arial','B',13);
         $this->Cell(60,7,'Serial Number',1,0,'L');
-        $this->Cell(120,7,$serial_no,1,1,'L');
+        $this->SetFont('Arial','',13);
+        $this->Cell(120,7,' '.$serial_no,1,1,'L');
         $this->SetX(15);
+        $this->SetFont('Arial','B',13);
         $this->Cell(60,7,'Examination Date',1,0,'L');
-        $this->Cell(120,7,$exam_date,1,1,'L');
+        $this->SetFont('Arial','',13);
+        $this->Cell(120,7,' '.$exam_date,1,1,'L');
+        $this->SetX(15);
+        $this->SetFont('Arial','B',13);
+        $this->Cell(60,7,'Profession',1,0,'L');
+        $this->SetFont('Arial','',13);
+        $this->Cell(120,7,' '.$profession,1,1,'L');
         $this->SetX(15);
         
 
@@ -218,19 +262,20 @@ function Footer()
     //  $pdf->Line(10, 30, 345, 30);
     $pdf->Ln(3);
     
-    $query_result=mysqli_fetch_array($process_query);
-      $serial_no = $query_result['serial_no'];
-      $cand_name = $query_result['candidate_name'];
-      $country = $query_result['country'];
-      $phone_1 = $query_result['phone_1'];
-      $pp_no = $query_result['passport_no'];
-      $reg_date = $query_result['reg_date'];
-      $time = $query_result['created_at'];
-        $barc = $query_result['barcode_no'];
-       $token_no = $query_result['token_no'];
+    // $query_result=mysqli_fetch_array($process_query);
+    //   $serial_no = $query_result['serial_no'];
+    //   $cand_name = $query_result['candidate_name'];
+    //   $country = $query_result['country'];
+    //   $phone_1 = $query_result['phone_1'];
+    //   $pp_no = $query_result['passport_no'];
+    //   $reg_date = $query_result['reg_date'];
+    //   $time = $query_result['created_at'];
+    //   $barc = $query_result['barcode_no'];
+    //   $token_no = $query_result['token_no'];
+    //   $profession = $query_result['profession'];
 
-      $cand_nameUpper = strtoupper($cand_name);
-      $countryUpper = strtoupper($country);
+    //   $cand_nameUpper = strtoupper($cand_name);
+    //   $countryUpper = strtoupper($country);
 
       //$pdf->SetFont('Arial','',10);
       $pdf->Body();

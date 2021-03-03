@@ -302,8 +302,13 @@ function Header()
 function Footer()
 {
   if($this->isFinished){
-        $this->Ln(15);
+        $this->Ln(14);
         $this->SetFont('Arial','',11);
+        $this->SetY(-21);
+        $this->SetX(216);
+        $signature="../assets/img/lab_register_signature.png";
+        $this->Cell(80,40,$this->Image($signature,$this->GetX(),$this->GetY(),32,18),0,0,'L',false);
+        $this->SetY(-13);
         $this->SetX(180);
         $this->Cell(80,10,"Checked By   _______________________",0,0,'R');
         $this->Ln(5);
@@ -354,7 +359,7 @@ function Footer()
           $pdf->SetX(5);
           if($serial_code=="S.No") {
             $pdf->Cell(15, 6, $serial_no, 1,0,'C');
-          } else {
+          } else {  
             $pdf->Cell(15, 6, $barcode, 1,0,'C');
           }
           // $pdf->Cell(32, 6, $cand_nameUpper, 1, 0,'C');

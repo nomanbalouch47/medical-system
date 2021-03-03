@@ -20,10 +20,17 @@ if(isset($_POST["cand_xray1"])) {
     $loginuser = $_POST['loginid'];
     $center_id = $_POST['center_id'];
     
-    $xray_status = 'FIT';
     if($xray_chest == 'unfit due to x-ray findings')
     {
         $xray_status = 'UNFIT';
+    }
+    elseif($xray_chest == 'repeat') 
+    {
+        $xray_status = 'In Process';
+    }
+    else 
+    {
+        $xray_status = 'FIT';
     }
     $processID = '5';
 
@@ -61,12 +68,14 @@ WHERE reg.serial_no='$serial' AND reg.reg_date='$xray_date' AND reg.country!='CA
             }
     
         $error=array();
-        $extension=array("jpeg","jpg","png","gif");
+        $extension=array("jpeg","jpg","png");
 
         foreach($_FILES["files"]["tmp_name"] as $key=>$tmp_name) {
             $file_name=$_FILES["files"]["name"][$key];
             $file_tmp=$_FILES["files"]["tmp_name"][$key];
             $ext=pathinfo($file_name,PATHINFO_EXTENSION);
+            $filename1=basename($file_name,$ext);
+            $newFileName1=str_replace(' ','-', $filename1).time().".".$ext;
             $filePath = "../assets/candidate_xray/".$file_name;
 
             if(in_array($ext,$extension)) {
@@ -76,21 +85,26 @@ WHERE reg.serial_no='$serial' AND reg.reg_date='$xray_date' AND reg.country!='CA
                     
                     $insert_xray_slip = array(
                         'reg_id' => mysqli_real_escape_string($data->con, $cand_Reg_ID),
-                        'xray_slips' => mysqli_real_escape_string($data->con, $filePath)
+                        'xray_slips' => mysqli_real_escape_string($data->con, $newFileName1)
                     );
-                    $data->insert('tb_xray_slips', $insert_xray_slip);
+                    if($data->insert('tb_xray_slips', $insert_xray_slip)){
+                        echo "<script>alert('Xray Result Uploaded')</script>";
+                    }
                 }
                 else {
                     
                     $filename=basename($file_name,$ext);
-                    $newFileName=$filename.time().".".$ext;
+                    $newFileName=str_replace(' ','-', $filename).time().".".$ext;
                     $newfilePath="../assets/candidate_xray/".$newFileName;
                     move_uploaded_file($file_tmp=$_FILES["files"]["tmp_name"][$key],$newfilePath);
                     $insert_xray_slip = array(
                         'reg_id' => mysqli_real_escape_string($data->con, $cand_Reg_ID),
-                        'xray_slips' => mysqli_real_escape_string($data->con, $newfilePath)
+                        'xray_slips' => mysqli_real_escape_string($data->con, $newFileName)
                     );
-                    $data->insert('tb_xray_slips', $insert_xray_slip);
+                    if($data->insert('tb_xray_slips', $insert_xray_slip)){
+                        echo "<script>alert('Xray Result Uploaded')</script>";
+                    }
+                    
                 }
             }
             else {
@@ -99,7 +113,7 @@ WHERE reg.serial_no='$serial' AND reg.reg_date='$xray_date' AND reg.country!='CA
             
         }
 
-        echo "<script>alert('Xray Result Uploaded')</script>";
+        // echo "<script>alert('Xray Result Uploaded')</script>";
         echo "<script>window.open('../xray_result','_self')</script>";
     }
 

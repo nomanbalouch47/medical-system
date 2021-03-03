@@ -75,7 +75,7 @@ include_once('include/head.php');
                               $p_o_i = $data->query("select Name from tb_country order by created_at DESC");
                               while ($bm=mysqli_fetch_array($p_o_i)) {
                                 $place_o_i = $bm['Name'];
-                                  echo "<option value=$place_o_i>$place_o_i</option>";
+                                  echo "<option value='$place_o_i'>$place_o_i</option>";
                               }
                               ?>
                           </select>

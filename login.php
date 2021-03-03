@@ -77,14 +77,18 @@
                     <input class="form-control" placeholder="Password" type="password" name="password">
                   </div>
                 </div>
-               <!--  <div class="custom-control custom-control-alternative custom-checkbox">
+                <div class="custom-control custom-control-alternative custom-checkbox">
                   <input class="custom-control-input" id=" customCheckLogin" type="checkbox">
                   <label class="custom-control-label" for=" customCheckLogin">
                     <span class="text-muted">Remember me</span>
                   </label>
-                </div> -->
+                </div>
                 <div class="text-center">
-                  <button type="submit" name="login" class="btn btn-primary my-4">Login</button>
+                  <!-- <button type="submit" name="login" class="btn btn-primary my-4"><span class=""><i class="ni ni-button-power"></i></span>&nbsp;Login</button> -->
+                  <button name="login" class="btn btn-icon btn-primary my-2" type="submit">
+                    <span class="btn-inner--icon"><i class="ni ni-button-power"></i></span>
+                    <span class="btn-inner--text">Login</span>
+                  </button>
                 </div>
               </form>
             </div>
@@ -93,8 +97,9 @@
             <!-- <div class="col-6">
               <a href="#" class="text-light"><small>Forgot password?</small></a>
             </div> -->
-            <?php login(); ?>
+            
           </div>
+          <?php login(); ?>
         </div>
       </div>
     </div>

@@ -2,7 +2,7 @@
     <div class="scrollbar-inner">
       <!-- Brand -->
       <div class="sidenav-header d-flex align-items-center">
-        <a class="navbar-brand" href="#">
+        <a class="navbar-brand ml-2" href="#">
           <img src="assets/img/comp_logo/reliance_logo.png" class="navbar-brand-img" alt="...">
         </a>
         <div class="ml-auto">
@@ -23,7 +23,7 @@
           <ul class="navbar-nav">
 
             <?php
-              if(auth_user_sideBar($loginuser,4)==1){
+              if(auth_user_sideBar($loginuser,42)==1){
             ?>            
             <li class="nav-item">
               <a class="nav-link" href="#navbar-dashboards" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="navbar-dashboards">
@@ -33,33 +33,108 @@
               </a>
               <div class="collapse" id="navbar-dashboards">
                 <ul class="nav nav-sm flex-column">
+
+                  <?php
+                    if(auth_user_sideBar($loginuser,8)==1){
+                  ?>
                   <li class="nav-item">
-                    <a href="#" class="nav-link">Dashboard</a>
+                    <a href="index" class="nav-link">Dashboard</a>
                   </li>
+
+                  <?php
+                    }
+                  ?>
+
+                  <?php
+                    if(auth_user_sideBar($loginuser,45)==1){
+                  ?>
+                  <li class="nav-item">
+                    <a href="change_medical_status" class="nav-link">Change Medical Status</a>
+                  </li>
+
+                  <?php
+                    }
+                  ?>
+
+                  <?php
+                    if(auth_user_sideBar($loginuser,4)==1){
+                  ?>
                   <li class="nav-item">
                     <a href="user_creation" class="nav-link">User Creation</a>
                   </li>
+                  <?php
+                    }
+                  ?>
+
+                  <?php
+                    if(auth_user_sideBar($loginuser,10)==1){
+                  ?>
                   <li class="nav-item">
                     <a href="user_role" class="nav-link">User Role</a>
                   </li>
+                  <?php
+                    }
+                  ?>
+
+                  <?php
+                    if(auth_user_sideBar($loginuser,11)==1){
+                  ?>
                   <li class="nav-item">
                     <a href="add_country" class="nav-link">Country Setup</a>
                   </li>
+                  <?php
+                    }
+                  ?>
+
+                  <?php
+                    if(auth_user_sideBar($loginuser,12)==1){
+                  ?>
                   <li class="nav-item">
                     <a href="add_profession" class="nav-link">Profession Setup</a>
                   </li>
+                  <?php
+                    }
+                  ?>
+                  
+                  <?php
+                    if(auth_user_sideBar($loginuser,13)==1){
+                  ?>
                   <li class="nav-item">
                     <a href="add_agency" class="nav-link">Agency Setup</a>
                   </li>
+                  <?php
+                    }
+                  ?>
+
+                  <?php
+                    if(auth_user_sideBar($loginuser,14)==1){
+                  ?>
                   <li class="nav-item">
                     <a href="add_nationality" class="nav-link">Nationality Setup</a>
                   </li>
+                  <?php
+                    }
+                  ?>
+
+                  <?php
+                    if(auth_user_sideBar($loginuser,15)==1){
+                  ?>
                   <li class="nav-item">
                     <a href="add_place_of_issue" class="nav-link">Place of Issue</a>
                   </li>
+                  <?php
+                    }
+                  ?>
+
+                  <?php
+                    if(auth_user_sideBar($loginuser,26)==1){
+                  ?>
                   <li class="nav-item">
                     <a href="print_duplicate_lab_sticker" class="nav-link">Duplicate Lab Sticker</a>
                   </li>
+                  <?php
+                    }
+                  ?>
 
                 </ul>
               </div>
@@ -300,6 +375,20 @@
                 <i class="ni ni-sound-wave text-danger"></i>
                 <!-- <i class="ni ni-archive-2 text-green"></i> -->
                 <span class="nav-link-text">Candidate Medical Status</span>
+              </a>
+            </li>
+            <?php
+              }
+            ?>
+
+            <?php
+              if(auth_user_sideBar($loginuser,43)==1){
+            ?>
+            <li class="nav-item">
+              <a class="nav-link" href="candidate_pictures">
+                <i class="ni ni-album-2 text-primary"></i>
+                <!-- <i class="ni ni-archive-2 text-green"></i> -->
+                <span class="nav-link-text">Candidate Pictures</span>
               </a>
             </li>
             <?php

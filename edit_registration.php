@@ -18,7 +18,7 @@ include_once('include/head.php');
 ?>
 <style type="text/css">
   
-  #errorclass
+  #errorclass,#successClass,#failClass
   {
   display:none;
   }
@@ -67,6 +67,18 @@ include_once('include/head.php');
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
+      <div class="alert alert-success alert-dismissible fade show col-md-offset-2" id="successClass" role="alert">   
+        <span class="alert-text"><strong>Success!</strong> Record Updated!</span>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="alert alert-danger alert-dismissible fade show col-md-offset-2" id="failClass" role="alert">   
+        <span class="alert-text"><strong>Warning!</strong> Update Fail, Try Again Later</span>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
 
                           
 
@@ -97,7 +109,7 @@ include_once('include/head.php');
                               <div class="input-group-prepend">
                                 <span class="input-group-text"><i class="fas fa-calendar"></i></span>
                               </div>
-                                <input class="form-control" type="date" id="search_with_date" placeholder="mm/dd/yyyy">
+                                <input class="form-control datepicker" type="text" id="search_with_date" name="search_with_date" placeholder="mm/dd/yyyy">
                             </div>
                           </div>
                         </div>
@@ -160,22 +172,22 @@ include_once('include/head.php');
                     <div class="col-md-6">
                       <div class="form-group">
                         <label class="form-control-label" for="exampleDatepicker">Passport No (<SPAN><i class="text-warning mb-0">required</i> )</SPAN></label>
-                        <input class="form-control" type="text" name="passport_no" placeholder="Passport Number" value="<?php echo $passport_no; ?>" required>
+                        <input class="form-control" type="text" name="passport_no" id="passport" placeholder="Passport Number" value="<?php echo $passport_no; ?>" required>
                       </div>
                     </div>
                   </div>
                   <div id="check_result"></div>
-                  <div class="row input-daterange datepicker align-items-center">
+                  <div class="row align-items-center">
                     <div class="col">
                       <div class="form-group">
                         <label class="form-control-label">Issue Date</label>
-                        <input class="form-control" type="datetime" name="passport_issue_date" placeholder="Passport Issue Date" value="<?php echo $passport_issue_date; ?>">                       
+                        <input class="form-control" type="datetime" name="passport_issue_date" placeholder="dd/mm/yyyy" value="<?php echo $passport_issue_date; ?>">                       
                       </div>
                     </div>
                     <div class="col">
                       <div class="form-group">
                         <label class="form-control-label">Expiry Date</label>
-                        <input class="form-control" type="datetime" name="passport_expiry_date" placeholder="Passport Expiry Date" value="<?php echo $passport_expiry_date; ?>">                       
+                        <input class="form-control" type="datetime" name="passport_expiry_date" placeholder="dd/mm/yyyy" value="<?php echo $passport_expiry_date; ?>">                       
                       </div>
                     </div>
                     <div class="col">
@@ -193,6 +205,18 @@ include_once('include/head.php');
                                 }
                                 ?>
                           </select>
+                      </div>
+                    </div>
+                    <div class="col">
+                      <div class="form-group">
+                        <label class="form-control-label">Ref: Slip Issue Date</label>
+                        <input class="form-control" type="date" name="ref_slip_issue_date" placeholder="dd/mm/yyyy" value="<?php echo $slip_issue_date; ?>">                       
+                      </div>
+                    </div>
+                    <div class="col">
+                      <div class="form-group">
+                        <label class="form-control-label">Ref: Slip Expiry</label>
+                        <input class="form-control" type="date" name="ref_slip_exp_date" placeholder="dd/mm/yyyy" value="<?php echo $slip_expiry_date; ?>">                       
                       </div>
                     </div>
                   </div>
@@ -215,7 +239,7 @@ include_once('include/head.php');
                     <div class="col-md-6">
                       <div class="form-group">                        
                           <label class="form-control-label" for="exampleDatepicker">Date</label>
-                          <input class="form-control" type="text" name="reg_date" value="<?php echo $reg_date; ?>" readonly>
+                          <input class="form-control" type="text" name="reg_date" placeholder="dd/mm/yyyy" value="<?php echo ($reg_date != '') ? $reg_date : $reg_date; ?>" required>
                           <span class="calendar-grid-58"></span>
                       
                       </div>
@@ -529,11 +553,17 @@ document.getElementById("snap").addEventListener("click", function() {
 
 $(function() { 
             $("#geeks").click(function() { 
+
+              if(document.getElementById('passport')) {
+
                 html2canvas($("#canvas"), { 
                     onrendered: function(canvas) { 
                         var imgsrc = canvas.toDataURL("image/png"); 
                         //console.log(imgsrc); 
-                        $("#newimg").attr('src', imgsrc); 
+                        $("#newimg").attr('src', imgsrc);
+
+                        var passport = document.getElementById('passport').value; 
+
                         //$("#img").show(); 
                         var dataURL = canvas.toDataURL(); 
                         $.ajax({ 
@@ -541,14 +571,19 @@ $(function() {
                             url: '././include/functions.php',
                             data: { 
                                 form_name : form_name,
-                                imgBase64: dataURL 
+                                imgBase64: dataURL,
+                                passport: passport
                             } 
                         }).done(function(data) {
                             $('#img_result').html(data); 
                             //console.log('saved'); 
                         }); 
                     } 
-                }); 
+                });
+              } 
+              else {
+                alert("To Save Candidate Image, Import Passport Info First!");
+              } 
             }); 
         }); 
 //camera script end
